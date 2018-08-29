@@ -48,6 +48,7 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.btnStop = new System.Windows.Forms.Button();
+            this.btnDownload = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -100,6 +101,7 @@
             this.btnClearKeywords.TabIndex = 4;
             this.btnClearKeywords.Text = "Clear";
             this.btnClearKeywords.UseVisualStyleBackColor = true;
+            this.btnClearKeywords.Click += new System.EventHandler(this.btnClearKeywords_Click);
             // 
             // btnRemoveKeyword
             // 
@@ -111,6 +113,7 @@
             this.btnRemoveKeyword.TabIndex = 4;
             this.btnRemoveKeyword.Text = "Remove";
             this.btnRemoveKeyword.UseVisualStyleBackColor = true;
+            this.btnRemoveKeyword.Click += new System.EventHandler(this.btnRemoveKeyword_Click);
             // 
             // btnAddKeyword
             // 
@@ -122,6 +125,7 @@
             this.btnAddKeyword.TabIndex = 4;
             this.btnAddKeyword.Text = "Add";
             this.btnAddKeyword.UseVisualStyleBackColor = true;
+            this.btnAddKeyword.Click += new System.EventHandler(this.btnAddKeyword_Click);
             // 
             // lbKeywords
             // 
@@ -131,8 +135,10 @@
             this.lbKeywords.FormattingEnabled = true;
             this.lbKeywords.Location = new System.Drawing.Point(186, 52);
             this.lbKeywords.Name = "lbKeywords";
+            this.lbKeywords.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.lbKeywords.Size = new System.Drawing.Size(621, 108);
             this.lbKeywords.TabIndex = 3;
+            this.lbKeywords.SelectedIndexChanged += new System.EventHandler(this.lbKeywords_SelectedIndexChanged);
             // 
             // radSelectedKeywords
             // 
@@ -192,6 +198,7 @@
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.listView1_ItemChecked);
+            this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
             // 
             // culOrder
             // 
@@ -272,12 +279,25 @@
             this.btnStop.TabIndex = 8;
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
+            // btnDownload
+            // 
+            this.btnDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDownload.Enabled = false;
+            this.btnDownload.Location = new System.Drawing.Point(896, 259);
+            this.btnDownload.Name = "btnDownload";
+            this.btnDownload.Size = new System.Drawing.Size(101, 31);
+            this.btnDownload.TabIndex = 9;
+            this.btnDownload.Text = "Download";
+            this.btnDownload.UseVisualStyleBackColor = true;
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1000, 479);
+            this.Controls.Add(this.btnDownload);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.chbCheckUnCheckAll);
@@ -322,6 +342,7 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button btnStop;
+        private System.Windows.Forms.Button btnDownload;
     }
 }
 

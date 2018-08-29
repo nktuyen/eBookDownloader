@@ -24,6 +24,7 @@ namespace eBookDownload
     {
         protected string _name = string.Empty;
         protected string _home = string.Empty;
+        protected string _keyword = string.Empty;
         protected string _query = string.Empty;
         protected Downloader _instance = null;
         protected WebRequest _request = null;
@@ -63,31 +64,44 @@ namespace eBookDownload
                 WorkingDirectory = System.Environment.CurrentDirectory;
         }
 
-        public abstract Dictionary<string,string> Download(string keyword = "");
-        protected abstract Dictionary<string,string> DownloadBooksInPage(int page);
-        protected abstract KeyValuePair<string,string> DownloadBook(string link);
+        public abstract Dictionary<string,string> Search(string keyword = "", bool bDownloadDirectly = false);
+        protected abstract Dictionary<string,string> SearchBooksInPage(int page, bool bDownloadDirectly = false);
+        protected abstract KeyValuePair<string,string> SearchBook(string link, bool bDownloadDirectly = false);
         protected virtual void OnFileFound(KeyValuePair<string,string> file)
         {
             FileFound?.Invoke(this, new DownloadEventArg(file.Value, file.Key));
         }
-        protected string DownloadFile(string url, string contentType = "")
+        protected string DownloadFile(string url, string name)
         {
             if (url == null || url == string.Empty)
                 return string.Empty;
 
             WebClient webClient = new WebClient();
-            string filePath = WorkingDirectory + url.Substring(url.LastIndexOf("/"));
+
+            string strExt = string.Empty;
+            int extPos = url.LastIndexOf(".");
+            if (extPos > 0)
+                strExt = url.Substring(extPos);
+
+
+            string strPath = WorkingDirectory + "\\" + _keyword + "\\";
+            string strName =  name + strExt;
+
+            System.IO.DirectoryInfo directory = System.IO.Directory.CreateDirectory(strPath);
+            if (!directory.Exists)
+                directory.Create();
+
             try
             {
-                webClient.DownloadFile(url, filePath);
+                webClient.DownloadFile(url, strPath + strName);
             }
             catch(Exception ex)
             {
-                if (System.IO.File.Exists(filePath))
-                    System.IO.File.Delete(filePath);
-                filePath = string.Empty;
+                if (System.IO.File.Exists(strPath + strName))
+                    System.IO.File.Delete(strPath + strName);
+                return string.Empty;
             }
-            return filePath;
+            return strPath + strName;
         }
     }
 }

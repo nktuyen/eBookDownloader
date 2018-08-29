@@ -29,8 +29,9 @@ namespace eBookDownload
             return _inst;
         }
 
-        public override Dictionary<string,string> Download(string keyword = "")
+        public override Dictionary<string,string> Search(string keyword = "", bool bDownloadDirectly = false)
         {
+            _keyword = keyword;
             _query = "/searchbooks?keyword=" + keyword;
             HttpWebRequest httpReq = WebRequest.Create(Home + _query) as HttpWebRequest;
             Dictionary<string, string> files = new Dictionary<string, string>();
@@ -78,7 +79,7 @@ namespace eBookDownload
                 {
                     for(int i = 1; i <= pgs; i++)
                     {
-                        var res = DownloadBooksInPage(i);
+                        var res = SearchBooksInPage(i, bDownloadDirectly);
                         foreach(KeyValuePair<string,string> books in res)
                         {
                             files.Add(books.Key, books.Value);
@@ -90,7 +91,7 @@ namespace eBookDownload
             return files;
         }
 
-        protected override Dictionary<string,string> DownloadBooksInPage(int page)
+        protected override Dictionary<string,string> SearchBooksInPage(int page, bool bDownloadDirectly = false)
         {
             Dictionary<string, string> files = new Dictionary<string, string>();
             HttpWebRequest httpReq = WebRequest.Create(Home + _query + "&pageIndex=" + page) as HttpWebRequest;
@@ -137,7 +138,7 @@ namespace eBookDownload
                             strhRef = code.Substring(ff, ll - ff);
                             if (strhRef.Trim().Length > 0)
                             {
-                                bookPath = DownloadBook(strhRef);
+                                bookPath = SearchBook(strhRef, bDownloadDirectly);
                                 if (bookPath.Value.Length>0)
                                 {
                                     files.Add(bookPath.Key, bookPath.Value);
@@ -154,7 +155,7 @@ namespace eBookDownload
             return files;
         }
 
-        protected override KeyValuePair<string,string> DownloadBook(string link)
+        protected override KeyValuePair<string,string> SearchBook(string link, bool bDownloadDirectly = false)
         {
             HttpWebRequest httpReq = WebRequest.Create(Home +link) as HttpWebRequest;
             if (httpReq != null)
@@ -217,6 +218,10 @@ namespace eBookDownload
                             {
                                 KeyValuePair<string, string> file = new KeyValuePair<string, string>(strLink, strTitle);
                                 this.OnFileFound(file);
+                                if (bDownloadDirectly)
+                                {
+                                    DownloadFile(strLink, strTitle);
+                                }
                                 return file;
                             }
                         }

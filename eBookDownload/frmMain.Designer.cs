@@ -45,10 +45,11 @@
             this.btnSearch = new System.Windows.Forms.Button();
             this.chbAutoDownload = new System.Windows.Forms.CheckBox();
             this.chbCheckUnCheckAll = new System.Windows.Forms.CheckBox();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.searchWorker = new System.ComponentModel.BackgroundWorker();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnDownload = new System.Windows.Forms.Button();
+            this.downloadWorker = new System.ComponentModel.BackgroundWorker();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -135,7 +136,7 @@
             this.lbKeywords.FormattingEnabled = true;
             this.lbKeywords.Location = new System.Drawing.Point(186, 52);
             this.lbKeywords.Name = "lbKeywords";
-            this.lbKeywords.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
+            this.lbKeywords.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lbKeywords.Size = new System.Drawing.Size(621, 108);
             this.lbKeywords.TabIndex = 3;
             this.lbKeywords.SelectedIndexChanged += new System.EventHandler(this.lbKeywords_SelectedIndexChanged);
@@ -146,9 +147,9 @@
             this.radSelectedKeywords.Enabled = false;
             this.radSelectedKeywords.Location = new System.Drawing.Point(74, 52);
             this.radSelectedKeywords.Name = "radSelectedKeywords";
-            this.radSelectedKeywords.Size = new System.Drawing.Size(104, 17);
+            this.radSelectedKeywords.Size = new System.Drawing.Size(116, 17);
             this.radSelectedKeywords.TabIndex = 2;
-            this.radSelectedKeywords.Text = "Select Keywords";
+            this.radSelectedKeywords.Text = "Selected Keywords";
             this.radSelectedKeywords.UseVisualStyleBackColor = true;
             this.radSelectedKeywords.CheckedChanged += new System.EventHandler(this.radSelectedKeywords_CheckedChanged);
             // 
@@ -230,8 +231,6 @@
             // 
             this.chbAutoDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chbAutoDownload.AutoSize = true;
-            this.chbAutoDownload.Checked = true;
-            this.chbAutoDownload.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chbAutoDownload.Location = new System.Drawing.Point(896, 110);
             this.chbAutoDownload.Name = "chbAutoDownload";
             this.chbAutoDownload.Size = new System.Drawing.Size(99, 17);
@@ -251,11 +250,11 @@
             this.chbCheckUnCheckAll.UseVisualStyleBackColor = true;
             this.chbCheckUnCheckAll.CheckedChanged += new System.EventHandler(this.chbCheckUnCheckAll_CheckedChanged);
             // 
-            // backgroundWorker1
+            // searchWorker
             // 
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            this.searchWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.searchWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+            this.searchWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
             // 
             // progressBar1
             // 
@@ -291,6 +290,13 @@
             this.btnDownload.TabIndex = 9;
             this.btnDownload.Text = "Download";
             this.btnDownload.UseVisualStyleBackColor = true;
+            this.btnDownload.Click += new System.EventHandler(this.btnDownload_Click);
+            // 
+            // downloadWorker
+            // 
+            this.downloadWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.downloadWorker_DoWork);
+            this.downloadWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.downloadWorker_ProgressChanged);
+            this.downloadWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.downloadWorker_RunWorkerCompleted);
             // 
             // frmMain
             // 
@@ -312,6 +318,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "eBookDownload";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmMain_FormClosed);
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -339,10 +346,11 @@
         private System.Windows.Forms.ColumnHeader colTitle;
         private System.Windows.Forms.ColumnHeader colLink;
         private System.Windows.Forms.CheckBox chbCheckUnCheckAll;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.ComponentModel.BackgroundWorker searchWorker;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.Button btnDownload;
+        private System.ComponentModel.BackgroundWorker downloadWorker;
     }
 }
 

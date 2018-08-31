@@ -37,6 +37,8 @@ namespace eBookDownload
             Dictionary<string, string> files = new Dictionary<string, string>();
             if (httpReq != null)
             {
+                if (IsCancel)
+                    return files;
                 WebResponse webResponse = httpReq.GetResponse();
                 Stream html = webResponse.GetResponseStream();
                 StreamReader reader = new StreamReader(html);
@@ -51,6 +53,9 @@ namespace eBookDownload
                 int ff = 0, ll = 0, pgs = 0;
                 while (first < htmlString.Length)
                 {
+                    if (IsCancel)
+                        return files;
+
                     bFoundCloseTag = true;
                     last = htmlString.IndexOf(strScripClose, first + strScriptOpen.Length + 1);
                     if ((last > htmlString.Length) || (-1 == last) )
@@ -79,9 +84,13 @@ namespace eBookDownload
                 {
                     for(int i = 1; i <= pgs; i++)
                     {
+                        if (IsCancel)
+                            return files;
                         var res = SearchBooksInPage(i, bDownloadDirectly);
                         foreach(KeyValuePair<string,string> books in res)
                         {
+                            if (IsCancel)
+                                return files;
                             files.Add(books.Key, books.Value);
                         }
                     }
@@ -97,6 +106,8 @@ namespace eBookDownload
             HttpWebRequest httpReq = WebRequest.Create(Home + _query + "&pageIndex=" + page) as HttpWebRequest;
             if (httpReq != null)
             {
+                if (IsCancel)
+                    return files;
                 WebResponse webResponse = httpReq.GetResponse();
                 Stream html = webResponse.GetResponseStream();
                 StreamReader reader = new StreamReader(html);
@@ -114,6 +125,9 @@ namespace eBookDownload
                 KeyValuePair<string, string> bookPath = new KeyValuePair<string, string>();
                 while (first < htmlString.Length)
                 {
+                    if (IsCancel)
+                        return files;
+
                     bFoundCloseTag = true;
                     last = htmlString.IndexOf(strDIVClose, first + strDIVOpen.Length + 1);
                     if ((last > htmlString.Length) || (-1 == last))
@@ -138,11 +152,18 @@ namespace eBookDownload
                             strhRef = code.Substring(ff, ll - ff);
                             if (strhRef.Trim().Length > 0)
                             {
+                                if (IsCancel)
+                                    return files;
+
                                 bookPath = SearchBook(strhRef, bDownloadDirectly);
-                                if (bookPath.Value.Length>0)
+                                try
                                 {
-                                    files.Add(bookPath.Key, bookPath.Value);
+                                    if (bookPath.Value.Length > 0)
+                                    {
+                                        files.Add(bookPath.Key, bookPath.Value);
+                                    }
                                 }
+                                catch(Exception ex) {; }
                             }
                         }
                     }
@@ -158,8 +179,12 @@ namespace eBookDownload
         protected override KeyValuePair<string,string> SearchBook(string link, bool bDownloadDirectly = false)
         {
             HttpWebRequest httpReq = WebRequest.Create(Home +link) as HttpWebRequest;
+            KeyValuePair<string, string> file = new KeyValuePair<string, string>();
             if (httpReq != null)
             {
+                if (IsCancel)
+                    return file;
+
                 WebResponse webResponse = httpReq.GetResponse();
                 Stream html = webResponse.GetResponseStream();
                 StreamReader reader = new StreamReader(html);
@@ -180,6 +205,9 @@ namespace eBookDownload
                 string bookPath = string.Empty;
                 while (first>0 && first < htmlString.Length)
                 {
+                    if (IsCancel)
+                        return file;
+
                     bFoundCloseTag = true;
                     last = htmlString.IndexOf(strDIVClose, first + strDIVOpen.Length + 1);
                     if ((last > htmlString.Length) || (-1 == last))
@@ -216,11 +244,11 @@ namespace eBookDownload
                             strLink = strhRef.Substring(ff2, ll2 - ff2);
                             if (strLink.Length > 0)
                             {
-                                KeyValuePair<string, string> file = new KeyValuePair<string, string>(strLink, strTitle);
-                                this.OnFileFound(file);
+                                file = new KeyValuePair<string, string>(strLink, strTitle);
+                                int id = this.OnFileFound(file);
                                 if (bDownloadDirectly)
                                 {
-                                    DownloadFile(strLink, strTitle);
+                                    string location = DownloadFile(strLink, strTitle, id);
                                 }
                                 return file;
                             }

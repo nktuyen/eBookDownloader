@@ -104,5 +104,11 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\Error.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\Success.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

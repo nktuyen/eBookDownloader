@@ -14,10 +14,16 @@ namespace eBookDownload
     {
         public string Title { get; set; }
         public string URL{ get; set; }
-        public DownloadEventArg(string title, string url)
+        public int ID { get; set; }
+        public string Location { get; set; }
+        public bool Success { get; set; }
+        public DownloadEventArg(string title, string url, int id = -1, string location="")
         {
             Title = title;
             URL = url;
+            ID = id;
+            Location = location;
+            Success = false;
         }
     }
     public abstract class Downloader
@@ -29,8 +35,12 @@ namespace eBookDownload
         protected Downloader _instance = null;
         protected WebRequest _request = null;
 
-        public delegate void DownloadEventHandler(object sender, DownloadEventArg e);
-        public event DownloadEventHandler FileFound;
+        public delegate int FileFoundEventHandler(object sender, DownloadEventArg e);
+        public event FileFoundEventHandler FileFound;
+        public delegate bool QueryCancelEventHandler();
+        public event QueryCancelEventHandler QueryCancel;
+        public delegate void FileDownloadedEventHandler(object sender, DownloadEventArg e);
+        public event FileDownloadedEventHandler FileDownloaded;
 
         public string Name
         {
@@ -40,6 +50,18 @@ namespace eBookDownload
         public string Home {
             get { return _home; }
         }
+
+        protected bool IsCancel
+        {
+            get
+            {
+                if ((this.QueryCancel != null) && (this.QueryCancel()))
+                    return true;
+                else
+                    return false;
+            }
+        }
+
 
         public string WorkingDirectory { get; set; }
 
@@ -67,17 +89,45 @@ namespace eBookDownload
         public abstract Dictionary<string,string> Search(string keyword = "", bool bDownloadDirectly = false);
         protected abstract Dictionary<string,string> SearchBooksInPage(int page, bool bDownloadDirectly = false);
         protected abstract KeyValuePair<string,string> SearchBook(string link, bool bDownloadDirectly = false);
-        protected virtual void OnFileFound(KeyValuePair<string,string> file)
+        protected virtual int OnFileFound(KeyValuePair<string,string> file)
         {
-            FileFound?.Invoke(this, new DownloadEventArg(file.Value, file.Key));
+            if (FileFound != null)
+                return FileFound(this, new DownloadEventArg(file.Value, file.Key));
+            else
+                return -1;
         }
-        protected string DownloadFile(string url, string name)
+
+        protected virtual void OnFileDownloaded(int id, KeyValuePair<string, string> file, string location)
         {
+            if (FileDownloaded != null)
+            {
+                DownloadEventArg e = new DownloadEventArg(file.Value, file.Key, id, location);
+                e.Success = (location != string.Empty);
+                FileDownloaded(this, e);
+            }
+        }
+
+        private string ReplaceSpecialCharacters(string input)
+        {
+            string str1 = input.Replace('\\','_');
+            string str2 = str1.Replace('*', '_');
+            string str3 = str2.Replace('/', '_');
+            string str4 = str3.Replace('<', '_');
+            string str5 = str4.Replace('>', '_');
+            string str6 = str5.Replace('?', '_');
+
+            return str6;
+        }
+
+        public string DownloadFile(string url, string name, int id)
+        {
+            if (IsCancel)
+                return string.Empty;
+
             if (url == null || url == string.Empty)
                 return string.Empty;
 
             WebClient webClient = new WebClient();
-
             string strExt = string.Empty;
             int extPos = url.LastIndexOf(".");
             if (extPos > 0)
@@ -85,7 +135,7 @@ namespace eBookDownload
 
 
             string strPath = WorkingDirectory + "\\" + _keyword + "\\";
-            string strName =  name + strExt;
+            string strName = name + strExt;
 
             System.IO.DirectoryInfo directory = System.IO.Directory.CreateDirectory(strPath);
             if (!directory.Exists)
@@ -93,12 +143,22 @@ namespace eBookDownload
 
             try
             {
-                webClient.DownloadFile(url, strPath + strName);
+                if (IsCancel)
+                    return string.Empty;
+                string location = strPath + ReplaceSpecialCharacters(strName);
+                webClient.DownloadFile(url, location);
+                DownloadEventArg e = new DownloadEventArg(name, url, id, location);
+                e.Success = true;
+                FileDownloaded(this, e);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 if (System.IO.File.Exists(strPath + strName))
                     System.IO.File.Delete(strPath + strName);
+
+                DownloadEventArg e = new DownloadEventArg(name, url, id, string.Empty);
+                e.Success = false;
+                FileDownloaded(this, e);
                 return string.Empty;
             }
             return strPath + strName;

@@ -13,7 +13,7 @@ namespace eBookDownload
     public class SachLapTrinh_Dot_Com_Downloader : Downloader
     {
         private static SachLapTrinh_Dot_Com_Downloader _inst = null;
-    
+
         private SachLapTrinh_Dot_Com_Downloader(): base("http://www.sachlaptrinh.com", "http://www.sachlaptrinh.com")
         {
             
@@ -31,8 +31,8 @@ namespace eBookDownload
 
         public override Dictionary<string,string> Search(string keyword = "", bool bDownloadDirectly = false)
         {
-            _keyword = keyword;
-            _query = "/searchbooks?keyword=" + keyword;
+            _keyword = WebUtility.UrlEncode(WebUtility.UrlEncode(keyword));
+            _query = "/searchbooks?keyword=" + _keyword;
             HttpWebRequest httpReq = WebRequest.Create(Home + _query) as HttpWebRequest;
             Dictionary<string, string> files = new Dictionary<string, string>();
             if (httpReq != null)
@@ -82,7 +82,8 @@ namespace eBookDownload
 
                 if (pgs > 0)
                 {
-                    for(int i = 1; i <= pgs; i++)
+                    OnKeywordAdded(keyword);
+                    for (int i = 1; i <= pgs; i++)
                     {
                         if (IsCancel)
                             return files;
@@ -244,11 +245,11 @@ namespace eBookDownload
                             strLink = strhRef.Substring(ff2, ll2 - ff2);
                             if (strLink.Length > 0)
                             {
-                                file = new KeyValuePair<string, string>(strLink, strTitle);
+                                file = new KeyValuePair<string, string>(strLink, WebUtility.HtmlDecode(WebUtility.HtmlDecode(strTitle)));
                                 int id = this.OnFileFound(file);
                                 if (bDownloadDirectly)
                                 {
-                                    string location = DownloadFile(strLink, strTitle, id);
+                                    string location = DownloadFile(strLink, WebUtility.HtmlDecode( WebUtility.HtmlDecode(strTitle)), id);
                                 }
                                 return file;
                             }

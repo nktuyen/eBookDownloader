@@ -41,6 +41,8 @@ namespace eBookDownload
         public event QueryCancelEventHandler QueryCancel;
         public delegate void FileDownloadedEventHandler(object sender, DownloadEventArg e);
         public event FileDownloadedEventHandler FileDownloaded;
+        public delegate void AddKeywordEventHandler(string keyword);
+        public event AddKeywordEventHandler AddKeyword;
 
         public string Name
         {
@@ -107,6 +109,11 @@ namespace eBookDownload
             }
         }
 
+        protected void OnKeywordAdded(string keyword)
+        {
+            AddKeyword?.Invoke(keyword);
+        }
+
         private string ReplaceSpecialCharacters(string input)
         {
             string str1 = input.Replace('\\','_');
@@ -115,8 +122,9 @@ namespace eBookDownload
             string str4 = str3.Replace('<', '_');
             string str5 = str4.Replace('>', '_');
             string str6 = str5.Replace('?', '_');
-
-            return str6;
+            string str7 = str6.Replace(':', '_');
+            string str8 = str7.Replace(';', '_');
+            return str8;
         }
 
         public string DownloadFile(string url, string name, int id)

@@ -52,18 +52,25 @@ namespace eBookDownload
                 downloader.FileFound += new Downloader.FileFoundEventHandler(OnFileFound);
                 downloader.QueryCancel += new Downloader.QueryCancelEventHandler(IsCancel);
                 downloader.FileDownloaded += new Downloader.FileDownloadedEventHandler(OnFileDownloaded);
+                downloader.AddKeyword += new Downloader.AddKeywordEventHandler(OnKeywordAdded);
+
                 downloader = Downloaders.Instance.Next();
             }
 
             lbKeywords.Items.Clear();
-            StreamReader reader = new StreamReader("Keywords.txt");
-            string keyword = string.Empty;
-            while ((keyword = reader.ReadLine()) != null)
+
+            try
             {
-                if(keyword!=string.Empty)
-                    lbKeywords.Items.Add(keyword);
+                StreamReader reader = new StreamReader("Keywords.txt");
+                string keyword = string.Empty;
+                while ((keyword = reader.ReadLine()) != null)
+                {
+                    if (keyword != string.Empty)
+                        lbKeywords.Items.Add(keyword);
+                }
+                reader.Close();
             }
-            reader.Close();
+            catch(Exception ex) {; }
 
             listView1.SmallImageList = new ImageList();
             listView1.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Success);
@@ -80,7 +87,7 @@ namespace eBookDownload
             {
                 ListViewItem item = listView1.Items.Add((listView1.Items.Count + 1).ToString());
                 item.ImageIndex = -1;
-                item.SubItems.Add(WebUtility.HtmlDecode(e.Title));
+                item.SubItems.Add(e.Title);
                 item.SubItems.Add(e.URL);
 
                 return item.Index;
@@ -110,6 +117,20 @@ namespace eBookDownload
                     item.ImageIndex = 0;
                 else
                     item.ImageIndex = 1;
+            }
+        }
+
+        private void OnKeywordAdded(string keyword)
+        {
+            if (lbKeywords.InvokeRequired)
+            {
+                this.Invoke(new Downloader.AddKeywordEventHandler(OnKeywordAdded), new object[] { keyword });
+            }
+            else
+            {
+                int index = lbKeywords.FindStringExact(keyword);
+                if (index == -1)
+                    lbKeywords.Items.Add(keyword);
             }
         }
 

@@ -12,9 +12,9 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 
-namespace eBookDownload
+namespace eBookDownloader
 {
-    enum Work { eIdle=0, eSearching, eDownloading }
+    enum Work { eIdle = 0, eSearching, eDownloading }
 
     public partial class frmMain : Form
     {
@@ -42,19 +42,20 @@ namespace eBookDownload
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            Downloaders.Instance.First();
-            Downloader downloader = Downloaders.Instance.Next();
-            while (downloader != null)
+            if (Downloaders.Instance.First())
             {
-                cbbProviders.DisplayMember = "Name";
-                cbbProviders.ValueMember = "Instance";
-                cbbProviders.Items.Add(downloader);
-                downloader.FileFound += new Downloader.FileFoundEventHandler(OnFileFound);
-                downloader.QueryCancel += new Downloader.QueryCancelEventHandler(IsCancel);
-                downloader.FileDownloaded += new Downloader.FileDownloadedEventHandler(OnFileDownloaded);
-                downloader.AddKeyword += new Downloader.AddKeywordEventHandler(OnKeywordAdded);
+                BookStore downloader = Downloaders.Instance.Next();
+                while (downloader != null)
+                {
+                    cbbProviders.DisplayMember = "Name";
+                    cbbProviders.ValueMember = "Instance";
+                    cbbProviders.Items.Add(downloader);
+                    downloader.BookFound += new BookStore.BookFoundEventHandler(OnFileFound);
+                    downloader.QueryCancel += new BookStore.QueryCancelEventHandler(IsCancel);
+                    downloader.SearchStarted += new BookStore.SearchStartedEventHandler(OnKeywordSearchStarted);
 
-                downloader = Downloaders.Instance.Next();
+                    downloader = Downloaders.Instance.Next();
+                }
             }
 
             lbKeywords.Items.Clear();
@@ -70,22 +71,25 @@ namespace eBookDownload
                 }
                 reader.Close();
             }
-            catch(Exception ex) {; }
+            catch (Exception ex) {; }
 
-            listView1.SmallImageList = new ImageList();
-            listView1.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Success);
-            listView1.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Error);
+            lvwBooks.SmallImageList = new ImageList();
+            lvwBooks.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Success);
+            lvwBooks.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Error);
+
+            searchWorker.WorkerSupportsCancellation = true;
+            downloadWorker.WorkerSupportsCancellation = true;
         }
 
-        private int OnFileFound(object sender, DownloadEventArg e)
+        private int OnFileFound(object sender, BookFoundEventArg e)
         {
-            if (listView1.InvokeRequired)
+            if (lvwBooks.InvokeRequired)
             {
-                return (int)this.Invoke(new Downloader.FileFoundEventHandler(OnFileFound), new object[] { sender, e });
+                return (int)this.Invoke(new BookStore.BookFoundEventHandler(OnFileFound), new object[] { sender, e });
             }
             else
             {
-                ListViewItem item = listView1.Items.Add((listView1.Items.Count + 1).ToString());
+                ListViewItem item = lvwBooks.Items.Add((lvwBooks.Items.Count + 1).ToString());
                 item.ImageIndex = -1;
                 item.SubItems.Add(e.Title);
                 item.SubItems.Add(e.URL);
@@ -102,29 +106,11 @@ namespace eBookDownload
                 return downloadWorker.CancellationPending;
         }
 
-        private void OnFileDownloaded(object sender, DownloadEventArg e)
-        {
-            if (e.ID == -1)
-                return;
-            if (listView1.InvokeRequired)
-            {
-                this.Invoke(new Downloader.FileDownloadedEventHandler(OnFileDownloaded), new object[] { sender, e });
-            }
-            else
-            {
-                ListViewItem item = listView1.Items[e.ID];
-                if (e.Success)
-                    item.ImageIndex = 0;
-                else
-                    item.ImageIndex = 1;
-            }
-        }
-
-        private void OnKeywordAdded(string keyword)
+        private void OnKeywordSearchStarted(string keyword)
         {
             if (lbKeywords.InvokeRequired)
             {
-                this.Invoke(new Downloader.AddKeywordEventHandler(OnKeywordAdded), new object[] { keyword });
+                this.Invoke(new BookStore.SearchStartedEventHandler(OnKeywordSearchStarted), new object[] { keyword });
             }
             else
             {
@@ -137,37 +123,53 @@ namespace eBookDownload
         private void radSelectedKeywords_CheckedChanged(object sender, EventArgs e)
         {
             txtKeyword.Enabled = radInputKeyword.Checked;
-            btnAddKeyword.Enabled = btnClearKeywords.Enabled= lbKeywords.Enabled = (radSelectedKeywords.Checked);
-            btnRemoveKeyword.Enabled = lbKeywords.SelectedIndex != -1;
+            btnAddKeyword.Enabled = btnClearKeywords.Enabled = lbKeywords.Enabled = (radSelectedKeywords.Checked);
+            btnRemoveKeyword.Enabled = radSelectedKeywords.Checked && lbKeywords.SelectedIndex != -1;
             btnSearch.Enabled = (txtKeyword.Text != string.Empty && radInputKeyword.Checked) || (lbKeywords.SelectedIndex != -1 && radSelectedKeywords.Checked);
         }
 
         private void radInputKeyword_CheckedChanged(object sender, EventArgs e)
         {
             txtKeyword.Enabled = radInputKeyword.Checked;
-            btnAddKeyword.Enabled  = btnClearKeywords.Enabled = lbKeywords.Enabled = (!radInputKeyword.Checked);
+            btnAddKeyword.Enabled = btnClearKeywords.Enabled = lbKeywords.Enabled = (!radInputKeyword.Checked);
+            btnRemoveKeyword.Enabled = radSelectedKeywords.Checked && lbKeywords.SelectedIndex != -1;
             btnSearch.Enabled = (txtKeyword.Text != string.Empty && radInputKeyword.Checked) || (lbKeywords.SelectedIndex != -1 && radSelectedKeywords.Checked);
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            Downloader downloader = cbbProviders.SelectedItem as Downloader;
-            if (null == downloader)
-            {
+            if (Work != Work.eIdle && Work != Work.eSearching)
                 return;
+
+            if (Work == Work.eIdle)
+            {
+                BookStore downloader = cbbProviders.SelectedItem as BookStore;
+                if (null == downloader)
+                {
+                    return;
+                }                
+
+                if (searchWorker.IsBusy)
+                    return;
+
+                Work = Work.eSearching;
+
+                if (radInputKeyword.Checked)
+                    searchWorker.RunWorkerAsync(new object[] { downloader, txtKeyword.Text });
+                else
+                    searchWorker.RunWorkerAsync(new object[] { downloader, lbKeywords.SelectedItems });
             }
-            listView1.Items.Clear();
-            chbCheckUnCheckAll.Checked = false;
-            btnDownload.Enabled = false;
-            Work = Work.eSearching;
+            else if(Work== Work.eSearching)
+            {
+                if (searchWorker.IsBusy)
+                {
+                    DialogResult res = MessageBox.Show("Do you want to abort current operation (searching) ?", "Downloading", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (res != DialogResult.Yes)
+                        return;
 
-            if (searchWorker.IsBusy)
-                searchWorker.CancelAsync();
-
-            if (radInputKeyword.Checked)
-                searchWorker.RunWorkerAsync(new object[] { downloader, txtKeyword.Text, chbAutoDownload.Checked });
-            else
-                searchWorker.RunWorkerAsync(new object[] { downloader, lbKeywords.SelectedItems, chbAutoDownload.Checked });
+                    searchWorker.CancelAsync();
+                }
+            }
         }
 
         private void cbbProviders_SelectedIndexChanged(object sender, EventArgs e)
@@ -181,15 +183,15 @@ namespace eBookDownload
             btnSearch.Enabled = (txtKeyword.Text != string.Empty && radInputKeyword.Checked) || (lbKeywords.SelectedIndex != -1 && radSelectedKeywords.Checked);
         }
 
-        private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e)
+        private void lvwBooks_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             if (sender == this.ActiveControl)
             {
-                bool bAllChecked = listView1.Items.OfType<ListViewItem>().ToList().TrueForAll(IsChecked);
+                bool bAllChecked = lvwBooks.Items.OfType<ListViewItem>().ToList().TrueForAll(IsChecked);
                 chbCheckUnCheckAll.Checked = bAllChecked;
             }
 
-            bool bAllUnChecked = listView1.Items.OfType<ListViewItem>().ToList().TrueForAll(IsUnChecked);
+            bool bAllUnChecked = lvwBooks.Items.OfType<ListViewItem>().ToList().TrueForAll(IsUnChecked);
             btnDownload.Enabled = !bAllUnChecked;
         }
 
@@ -198,26 +200,26 @@ namespace eBookDownload
             if (sender == this.ActiveControl)
             {
                 bool bChecked = chbCheckUnCheckAll.Checked;
-                listView1.Items.OfType<ListViewItem>().ToList().ForEach(item => item.Checked = bChecked);
+                lvwBooks.Items.OfType<ListViewItem>().ToList().ForEach(item => item.Checked = bChecked);
             }
         }
 
-        private void OnSearchStart()
+        private void OnSearchWorkerStart()
         {
-            if (searchWorker.CancellationPending)
-                return;
-            if (progressBar1.InvokeRequired || btnSearch.InvokeRequired || btnStop.InvokeRequired || 
-                radInputKeyword.InvokeRequired || radSelectedKeywords.InvokeRequired || 
+            if (progressBar.InvokeRequired || btnSearch.InvokeRequired ||
+                radInputKeyword.InvokeRequired || radSelectedKeywords.InvokeRequired ||
                 chbAutoDownload.InvokeRequired || chbCheckUnCheckAll.InvokeRequired ||
-                cbbProviders.InvokeRequired || btnDownload.InvokeRequired || lbKeywords.InvokeRequired || txtKeyword.InvokeRequired)
+                cbbProviders.InvokeRequired || btnDownload.InvokeRequired || 
+                lbKeywords.InvokeRequired || txtKeyword.InvokeRequired ||
+                lvwBooks.InvokeRequired || chbCheckUnCheckAll.InvokeRequired)
             {
-                this.Invoke(new Action(OnSearchStart), new object[] { });
+                this.Invoke(new Action(OnSearchWorkerStart), new object[] { });
             }
             else
             {
-                progressBar1.Visible = true;
-                btnStop.Enabled = true;
-                btnSearch.Enabled = false;
+                lvwBooks.Items.Clear();
+                chbCheckUnCheckAll.Checked = false;
+                progressBar.Visible = true;
                 chbAutoDownload.Enabled = false;
                 radSelectedKeywords.Enabled = false;
                 radInputKeyword.Enabled = false;
@@ -225,26 +227,35 @@ namespace eBookDownload
                 cbbProviders.Enabled = false;
                 lbKeywords.Enabled = false;
                 txtKeyword.Enabled = false;
+                lvwBooks.Enabled = false;
+
+                if (Work == Work.eSearching)
+                {
+                    btnSearch.Text = eBookDownloader.Properties.Resources.IDS_CANCEL;
+                    btnDownload.Enabled = false;
+                }
+                else if(Work == Work.eDownloading)
+                {
+                    btnSearch.Enabled = false;
+                }
             }
         }
 
 
-        private void OnSearchFinish()
+        private void OnSearchWorkerFinish()
         {
-            if (searchWorker.CancellationPending)
-                return;
-            if (progressBar1.InvokeRequired || btnSearch.InvokeRequired || btnStop.InvokeRequired || 
-                radInputKeyword.InvokeRequired || radSelectedKeywords.InvokeRequired || 
+            if (progressBar.InvokeRequired || btnSearch.InvokeRequired ||
+                radInputKeyword.InvokeRequired || radSelectedKeywords.InvokeRequired ||
                 chbAutoDownload.InvokeRequired || chbCheckUnCheckAll.InvokeRequired ||
-                cbbProviders.InvokeRequired || btnDownload.InvokeRequired || listView1.InvokeRequired ||
-                lbKeywords.InvokeRequired || txtKeyword.InvokeRequired)
+                cbbProviders.InvokeRequired || btnDownload.InvokeRequired ||
+                lbKeywords.InvokeRequired || txtKeyword.InvokeRequired ||
+                lvwBooks.InvokeRequired || chbCheckUnCheckAll.InvokeRequired)
             {
-                this.Invoke(new Action(OnSearchFinish), new object[] { });
+                this.Invoke(new Action(OnSearchWorkerFinish), new object[] { });
             }
             else
             {
-                progressBar1.Visible = false;
-                btnStop.Enabled = false;
+                progressBar.Visible = false;
                 chbAutoDownload.Enabled = true;
                 chbCheckUnCheckAll.Enabled = true;
                 cbbProviders.Enabled = true;
@@ -256,46 +267,52 @@ namespace eBookDownload
                 else
                     txtKeyword_TextChanged(this, new EventArgs());
 
-                btnSearch.Enabled = (txtKeyword.Text != string.Empty && radInputKeyword.Checked) || (lbKeywords.SelectedIndex != -1 && radSelectedKeywords.Checked);
+                lvwBooks.Enabled = true;
+
+                if(Work == Work.eDownloading)
+                {
+                    btnSearch.Enabled = (txtKeyword.Text != string.Empty && radInputKeyword.Checked) || (lbKeywords.SelectedIndex != -1 && radSelectedKeywords.Checked);
+                }
+                else if(Work == Work.eSearching)
+                {
+                    btnSearch.Text = eBookDownloader.Properties.Resources.IDS_SEARCH;
+                    lvwBooks_ItemChecked(this, null);
+                }
 
                 Work = Work.eIdle;
             }
         }
 
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        private void searchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            OnSearchStart();
+            OnSearchWorkerStart();
 
             object[] parameters = e.Argument as object[];
-            Downloader downloader = parameters[0] as Downloader;
-            bool bAutoDownload = false;
+            BookStore downloader = parameters[0] as BookStore;
 
-            if (parameters.Length > 2)
-                bAutoDownload = (bool)parameters[2];
-
-            if(parameters[1] is string)
+            if (parameters[1] is string)
             {
                 string strKeyword = parameters[1] as string;
-                downloader.Search(strKeyword, bAutoDownload);
+                downloader.Search(strKeyword);
             }
             else
             {
                 ListBox.SelectedObjectCollection keywords = parameters[1] as ListBox.SelectedObjectCollection;
-                foreach(string strKeyword in keywords)
+                foreach (string strKeyword in keywords)
                 {
-                    downloader.Search(strKeyword, bAutoDownload);
+                    downloader.Search(strKeyword);
                 }
             }
         }
 
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void searchWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
 
         }
 
-        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void searchWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            OnSearchFinish();
+            OnSearchWorkerFinish();
         }
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -326,7 +343,7 @@ namespace eBookDownload
                         searchWorker.WorkerSupportsCancellation = true;
                         searchWorker.CancelAsync();
                     }
-                    else if(Work== Work.eDownloading)
+                    else if (Work == Work.eDownloading)
                     {
                         downloadWorker.WorkerSupportsCancellation = true;
                         downloadWorker.CancelAsync();
@@ -335,7 +352,7 @@ namespace eBookDownload
             }
         }
 
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        private void lvwBooks_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
@@ -375,46 +392,81 @@ namespace eBookDownload
 
         private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
         {
-            StreamWriter writer = new StreamWriter("Keywords.txt");
-            foreach(string keyword in lbKeywords.Items)
+            try
             {
-                writer.WriteLine(keyword);
+                StreamWriter writer = new StreamWriter("Keywords.txt");
+                foreach (string keyword in lbKeywords.Items)
+                {
+                    writer.WriteLine(keyword);
+                }
+                writer.Close();
             }
-            writer.Close();
+            catch (Exception ex) { }
+
+            if (Downloaders.Instance.First())
+            {
+                BookStore downloader = Downloaders.Instance.Next();
+                while (downloader != null)
+                {
+                    downloader.BookFound -= new BookStore.BookFoundEventHandler(OnFileFound);
+                    downloader.QueryCancel -= new BookStore.QueryCancelEventHandler(IsCancel);
+                    downloader.SearchStarted -= new BookStore.SearchStartedEventHandler(OnKeywordSearchStarted);
+
+                    downloader = Downloaders.Instance.Next();
+                }
+            }
         }
 
         private void btnDownload_Click(object sender, EventArgs e)
         {
-            Work = Work.eDownloading;
+            if (Work != Work.eIdle && Work != Work.eSearching)
+                return;
 
             if (downloadWorker.IsBusy)
-                downloadWorker.CancelAsync();
-
-            Downloader downloader = cbbProviders.SelectedItem as Downloader;
-            if (null == downloader)
-            {
                 return;
-            }
 
-            object[] selectedItems = new object[listView1.CheckedItems.Count];
-            listView1.CheckedItems.CopyTo(selectedItems, 0);
-            downloadWorker.RunWorkerAsync(new object[] { downloader, selectedItems });
+            if (Work == Work.eIdle)
+            {
+                Work = Work.eDownloading;
+                downloadWorker.RunWorkerAsync(new object[] { lvwBooks.CheckedItems.Count });
+            }
+            else if(Work == Work.eDownloading)
+            {
+                if (downloadWorker.IsBusy)
+                {
+                    DialogResult res = MessageBox.Show("Do you want to abort current operation (downloading) ?", "Downloading", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (res != DialogResult.Yes)
+                        return;
+
+                    downloadWorker.CancelAsync();
+                }
+            }
+        }
+
+        private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+
+        }
+
+        private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+
         }
 
         private void downloadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            if(listView1.InvokeRequired)
+            if (lvwBooks.InvokeRequired)
             {
-                Invoke(new System.ComponentModel.DoWorkEventHandler(downloadWorker_DoWork), new object[]{sender, e });
+                Invoke(new System.ComponentModel.DoWorkEventHandler(downloadWorker_DoWork), new object[] { sender, e });
             }
-            WebClient webClient = new WebClient();
+
             object[] arguments = e.Argument as object[];
             string url = string.Empty;
             string title = string.Empty;
             string location = string.Empty;
             int id = -1;
-            Downloader downloader = arguments[0] as Downloader;
             object[] items = arguments[1] as object[];
+
             foreach (ListViewItem item in items)
             {
                 id = item.Index;
@@ -422,9 +474,13 @@ namespace eBookDownload
                 url = item.SubItems[2].Text;
                 try
                 {
-                    location = downloader.DownloadFile(url, title, id);
+                    WebClient webClient = new WebClient();
+                    webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(OnDownloadFileCompleted);
+                    webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(OnDownloadProgressChanged);
+
+                    webClient.DownloadFileAsync(new Uri(url), title);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     continue;
                 }
@@ -439,6 +495,18 @@ namespace eBookDownload
         private void downloadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
+        }
+
+        private void lbKeywords_DoubleClick(object sender, EventArgs e)
+        {
+            frmInputKeyword frm = new frmInputKeyword();
+            frm.Keyword = lbKeywords.SelectedItem as string;
+            frm.Index = lbKeywords.SelectedIndex;
+
+            if (frm.ShowDialog() != DialogResult.OK)
+                return;
+
+            lbKeywords.Items[frm.Index] = frm.Keyword;
         }
     }
 }

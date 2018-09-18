@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Xml.XPath;
 using System.Windows.Forms;
 
-namespace eBookDownload
+namespace eBookDownloader
 {
-    public class SachLapTrinh_Dot_Com_Downloader : Downloader
+    public class SachLapTrinh_Dot_Com_Downloader : BookStore
     {
         private static SachLapTrinh_Dot_Com_Downloader _inst = null;
 
@@ -29,7 +29,7 @@ namespace eBookDownload
             return _inst;
         }
 
-        public override Dictionary<string,string> Search(string keyword = "", bool bDownloadDirectly = false)
+        public override Dictionary<string,string> Search(string keyword = "")
         {
             _keyword = WebUtility.UrlEncode(WebUtility.UrlEncode(keyword));
             _query = "/searchbooks?keyword=" + _keyword;
@@ -82,12 +82,12 @@ namespace eBookDownload
 
                 if (pgs > 0)
                 {
-                    OnKeywordAdded(keyword);
+                    OnSearchStarted(keyword);
                     for (int i = 1; i <= pgs; i++)
                     {
                         if (IsCancel)
                             return files;
-                        var res = SearchBooksInPage(i, bDownloadDirectly);
+                        var res = SearchInPage(i);
                         foreach(KeyValuePair<string,string> books in res)
                         {
                             if (IsCancel)
@@ -101,7 +101,7 @@ namespace eBookDownload
             return files;
         }
 
-        protected override Dictionary<string,string> SearchBooksInPage(int page, bool bDownloadDirectly = false)
+        protected override Dictionary<string,string> SearchInPage(int page)
         {
             Dictionary<string, string> files = new Dictionary<string, string>();
             HttpWebRequest httpReq = WebRequest.Create(Home + _query + "&pageIndex=" + page) as HttpWebRequest;
@@ -123,7 +123,7 @@ namespace eBookDownload
                 bool bFoundCloseTag = false;
                 string code = string.Empty;
                 int ff = 0, ll = 0;
-                KeyValuePair<string, string> bookPath = new KeyValuePair<string, string>();
+                KeyValuePair<string, string> bookInfo = new KeyValuePair<string, string>();
                 while (first < htmlString.Length)
                 {
                     if (IsCancel)
@@ -156,12 +156,12 @@ namespace eBookDownload
                                 if (IsCancel)
                                     return files;
 
-                                bookPath = SearchBook(strhRef, bDownloadDirectly);
+                                bookInfo = SearchLink(strhRef);
                                 try
                                 {
-                                    if (bookPath.Value.Length > 0)
+                                    if (bookInfo.Value.Length > 0)
                                     {
-                                        files.Add(bookPath.Key, bookPath.Value);
+                                        files.Add(bookInfo.Key, bookInfo.Value);
                                     }
                                 }
                                 catch(Exception ex) {; }
@@ -177,7 +177,7 @@ namespace eBookDownload
             return files;
         }
 
-        protected override KeyValuePair<string,string> SearchBook(string link, bool bDownloadDirectly = false)
+        protected override KeyValuePair<string,string> SearchLink(string link)
         {
             HttpWebRequest httpReq = WebRequest.Create(Home +link) as HttpWebRequest;
             KeyValuePair<string, string> file = new KeyValuePair<string, string>();
@@ -246,11 +246,7 @@ namespace eBookDownload
                             if (strLink.Length > 0)
                             {
                                 file = new KeyValuePair<string, string>(strLink, WebUtility.HtmlDecode(WebUtility.HtmlDecode(strTitle)));
-                                int id = this.OnFileFound(file);
-                                if (bDownloadDirectly)
-                                {
-                                    string location = DownloadFile(strLink, WebUtility.HtmlDecode( WebUtility.HtmlDecode(strTitle)), id);
-                                }
+                                this.OnBookFound(file);
                                 return file;
                             }
                         }

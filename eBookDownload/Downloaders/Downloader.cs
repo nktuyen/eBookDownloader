@@ -8,41 +8,33 @@ using System.Xml.XPath;
 using System.Windows.Forms;
 using System.IO;
 
-namespace eBookDownload
+namespace eBookDownloader
 {
-    public sealed class DownloadEventArg : EventArgs
+    public sealed class BookFoundEventArg : EventArgs
     {
         public string Title { get; set; }
         public string URL{ get; set; }
-        public int ID { get; set; }
-        public string Location { get; set; }
-        public bool Success { get; set; }
-        public DownloadEventArg(string title, string url, int id = -1, string location="")
+        public BookFoundEventArg(string title, string url)
         {
             Title = title;
             URL = url;
-            ID = id;
-            Location = location;
-            Success = false;
         }
     }
-    public abstract class Downloader
+    public abstract class BookStore
     {
         protected string _name = string.Empty;
         protected string _home = string.Empty;
         protected string _keyword = string.Empty;
         protected string _query = string.Empty;
-        protected Downloader _instance = null;
+        protected BookStore _instance = null;
         protected WebRequest _request = null;
 
-        public delegate int FileFoundEventHandler(object sender, DownloadEventArg e);
-        public event FileFoundEventHandler FileFound;
+        public delegate int BookFoundEventHandler(object sender, BookFoundEventArg e);
+        public event BookFoundEventHandler BookFound;
         public delegate bool QueryCancelEventHandler();
         public event QueryCancelEventHandler QueryCancel;
-        public delegate void FileDownloadedEventHandler(object sender, DownloadEventArg e);
-        public event FileDownloadedEventHandler FileDownloaded;
-        public delegate void AddKeywordEventHandler(string keyword);
-        public event AddKeywordEventHandler AddKeyword;
+        public delegate void SearchStartedEventHandler(string keyword);
+        public event SearchStartedEventHandler SearchStarted;
 
         public string Name
         {
@@ -67,12 +59,12 @@ namespace eBookDownload
 
         public string WorkingDirectory { get; set; }
 
-        public Downloader Instance
+        public BookStore Instance
         {
             get { return _instance; }
         }
 
-        public Downloader(string name, string home="")
+        public BookStore(string name, string home="")
         {
             if ((null==name)||(string.Empty == name))
             {
@@ -88,30 +80,17 @@ namespace eBookDownload
                 WorkingDirectory = System.Environment.CurrentDirectory;
         }
 
-        public abstract Dictionary<string,string> Search(string keyword = "", bool bDownloadDirectly = false);
-        protected abstract Dictionary<string,string> SearchBooksInPage(int page, bool bDownloadDirectly = false);
-        protected abstract KeyValuePair<string,string> SearchBook(string link, bool bDownloadDirectly = false);
-        protected virtual int OnFileFound(KeyValuePair<string,string> file)
+        public abstract Dictionary<string,string> Search(string keyword = "");
+        protected abstract Dictionary<string,string> SearchInPage(int page);
+        protected abstract KeyValuePair<string,string> SearchLink(string title);
+        protected virtual void OnBookFound(KeyValuePair<string,string> file)
         {
-            if (FileFound != null)
-                return FileFound(this, new DownloadEventArg(file.Value, file.Key));
-            else
-                return -1;
+            BookFound?.Invoke(this, new BookFoundEventArg(file.Value, file.Key));
         }
 
-        protected virtual void OnFileDownloaded(int id, KeyValuePair<string, string> file, string location)
+        protected void OnSearchStarted(string keyword)
         {
-            if (FileDownloaded != null)
-            {
-                DownloadEventArg e = new DownloadEventArg(file.Value, file.Key, id, location);
-                e.Success = (location != string.Empty);
-                FileDownloaded(this, e);
-            }
-        }
-
-        protected void OnKeywordAdded(string keyword)
-        {
-            AddKeyword?.Invoke(keyword);
+            SearchStarted?.Invoke(keyword);
         }
 
         private string ReplaceSpecialCharacters(string input)
@@ -125,51 +104,6 @@ namespace eBookDownload
             string str7 = str6.Replace(':', '_');
             string str8 = str7.Replace(';', '_');
             return str8;
-        }
-
-        public string DownloadFile(string url, string name, int id)
-        {
-            if (IsCancel)
-                return string.Empty;
-
-            if (url == null || url == string.Empty)
-                return string.Empty;
-
-            WebClient webClient = new WebClient();
-            string strExt = string.Empty;
-            int extPos = url.LastIndexOf(".");
-            if (extPos > 0)
-                strExt = url.Substring(extPos);
-
-
-            string strPath = WorkingDirectory + "\\" + _keyword + "\\";
-            string strName = name + strExt;
-
-            System.IO.DirectoryInfo directory = System.IO.Directory.CreateDirectory(strPath);
-            if (!directory.Exists)
-                directory.Create();
-
-            try
-            {
-                if (IsCancel)
-                    return string.Empty;
-                string location = strPath + ReplaceSpecialCharacters(strName);
-                webClient.DownloadFile(url, location);
-                DownloadEventArg e = new DownloadEventArg(name, url, id, location);
-                e.Success = true;
-                FileDownloaded(this, e);
-            }
-            catch (Exception ex)
-            {
-                if (System.IO.File.Exists(strPath + strName))
-                    System.IO.File.Delete(strPath + strName);
-
-                DownloadEventArg e = new DownloadEventArg(name, url, id, string.Empty);
-                e.Success = false;
-                FileDownloaded(this, e);
-                return string.Empty;
-            }
-            return strPath + strName;
         }
     }
 }

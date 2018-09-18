@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eBookDownload
+namespace eBookDownloader
 { 
     public class Downloaders
     {
-        private static Dictionary<string, Downloader> _downloaders = null;
-        private static Dictionary<string, Downloader>.Enumerator _enumer;
+        private static Dictionary<string, BookStore> _downloaders = null;
+        private static Dictionary<string, BookStore>.Enumerator _enumer;
         private static Downloaders _instance = null;
 
         public static Downloaders Instance
@@ -26,8 +26,8 @@ namespace eBookDownload
         {
             if (null == _downloaders)
             {
-                _downloaders = new Dictionary<string, Downloader>();
-                Downloader downloader = SachLapTrinh_Dot_Com_Downloader.GetInstance();
+                _downloaders = new Dictionary<string, BookStore>();
+                BookStore downloader = SachLapTrinh_Dot_Com_Downloader.GetInstance();
                 _downloaders.Add(downloader.Name, downloader);
             }
         }
@@ -43,7 +43,7 @@ namespace eBookDownload
             return false;
         }
 
-        public Downloader Next()
+        public BookStore Next()
         {
             if(_downloaders.Count>0)
             {
@@ -56,7 +56,7 @@ namespace eBookDownload
             return null;
         }
 
-        public Downloader Find(string name)
+        public BookStore Find(string name)
         {
             if((_downloaders.Count>0) && (_downloaders.ContainsKey(name)))
             {
@@ -66,7 +66,7 @@ namespace eBookDownload
             return null;
         }
 
-        internal void Register(string name, Downloader downloader)
+        internal void Register(string name, BookStore downloader)
         {
             if ((null == name) || (string.Empty == name))
             {

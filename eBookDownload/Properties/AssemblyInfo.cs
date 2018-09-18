@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("eBookDownloader")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("NKTUYEN")]
-[assembly: AssemblyProduct("eBookDownload")]
+[assembly: AssemblyProduct("eBookDownloader")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

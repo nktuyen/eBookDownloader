@@ -71,6 +71,51 @@ namespace eBookDownloader.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Cancel.
+        /// </summary>
+        internal static string IDS_CANCEL {
+            get {
+                return ResourceManager.GetString("IDS_CANCEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Download.
+        /// </summary>
+        internal static string IDS_DOWNLOAD {
+            get {
+                return ResourceManager.GetString("IDS_DOWNLOAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Search.
+        /// </summary>
+        internal static string IDS_SEARCH {
+            get {
+                return ResourceManager.GetString("IDS_SEARCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Stop.
+        /// </summary>
+        internal static string IDS_STOP {
+            get {
+                return ResourceManager.GetString("IDS_STOP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total.
+        /// </summary>
+        internal static string IDS_TOTAL {
+            get {
+                return ResourceManager.GetString("IDS_TOTAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon Success {

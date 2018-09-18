@@ -13,9 +13,12 @@ namespace eBookDownloader
     public partial class frmInputKeyword : Form
     {
         public string Keyword { get; set; }
+        public int Index { get; set; }
         public frmInputKeyword()
         {
             InitializeComponent();
+            Index = -1;
+            Keyword = string.Empty;
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -29,6 +32,11 @@ namespace eBookDownloader
             {
                 this.Keyword = txtKeyword.Text;
             }
+        }
+
+        private void frmInputKeyword_Load(object sender, EventArgs e)
+        {
+            txtKeyword.Text = Keyword;
         }
     }
 }

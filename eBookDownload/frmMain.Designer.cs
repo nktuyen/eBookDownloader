@@ -41,12 +41,8 @@
             this.radSelectedKeywords = new System.Windows.Forms.RadioButton();
             this.radInputKeyword = new System.Windows.Forms.RadioButton();
             this.txtKeyword = new System.Windows.Forms.TextBox();
-            this.lvwBooks = new  ListViewEx();
-            this.culOrder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colLink = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.mnuBookPopupMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.browseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.explorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -64,6 +60,11 @@
             this.btnDownload = new System.Windows.Forms.Button();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.lblKeyword = new System.Windows.Forms.Label();
+            this.lvwBooks = new eBookDownloader.ListViewEx();
+            this.culOrder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colLink = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox1.SuspendLayout();
             this.mnuBookPopupMenu.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -218,86 +219,48 @@
             this.txtKeyword.TabIndex = 1;
             this.txtKeyword.TextChanged += new System.EventHandler(this.txtKeyword_TextChanged);
             // 
-            // lvwBooks
-            // 
-            this.lvwBooks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvwBooks.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lvwBooks.CheckBoxes = true;
-            this.lvwBooks.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.culOrder,
-            this.colTitle,
-            this.colLink,
-            this.colPath});
-            this.lvwBooks.ContextMenuStrip = this.mnuBookPopupMenu;
-            this.lvwBooks.FullRowSelect = true;
-            this.lvwBooks.GridLines = true;
-            this.lvwBooks.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.lvwBooks.HideSelection = false;
-            this.lvwBooks.Location = new System.Drawing.Point(15, 233);
-            this.lvwBooks.Name = "lvwBooks";
-            this.lvwBooks.ShowItemToolTips = true;
-            this.lvwBooks.Size = new System.Drawing.Size(885, 146);
-            this.lvwBooks.TabIndex = 3;
-            this.lvwBooks.UseCompatibleStateImageBehavior = false;
-            this.lvwBooks.View = System.Windows.Forms.View.Details;
-            this.lvwBooks.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.lvwBooks_ItemChecked);
-            this.lvwBooks.SelectedIndexChanged += new System.EventHandler(this.lvwBooks_SelectedIndexChanged);
-            // 
-            // culOrder
-            // 
-            this.culOrder.Text = "#";
-            // 
-            // colTitle
-            // 
-            this.colTitle.Text = "Title";
-            this.colTitle.Width = 380;
-            // 
-            // colLink
-            // 
-            this.colLink.Text = "URL";
-            this.colLink.Width = 320;
-            // 
-            // colPath
-            // 
-            this.colPath.Text = "Local Path";
-            this.colPath.Width = 400;
-            // 
             // mnuBookPopupMenu
             // 
             this.mnuBookPopupMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.browseToolStripMenuItem,
             this.openToolStripMenuItem,
             this.explorerToolStripMenuItem,
             this.toolStripMenuItem1,
             this.downloadToolStripMenuItem});
             this.mnuBookPopupMenu.Name = "mnuBookPopupMenu";
-            this.mnuBookPopupMenu.Size = new System.Drawing.Size(129, 76);
+            this.mnuBookPopupMenu.Size = new System.Drawing.Size(223, 120);
             this.mnuBookPopupMenu.Opening += new System.ComponentModel.CancelEventHandler(this.mnuBookPopupMenu_Opening);
+            // 
+            // browseToolStripMenuItem
+            // 
+            this.browseToolStripMenuItem.Name = "browseToolStripMenuItem";
+            this.browseToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.browseToolStripMenuItem.Text = "Open in &Web Browser";
+            this.browseToolStripMenuItem.Click += new System.EventHandler(this.browseToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
-            this.openToolStripMenuItem.Text = "&Open";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.openToolStripMenuItem.Text = "&Open Local File";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // explorerToolStripMenuItem
             // 
             this.explorerToolStripMenuItem.Name = "explorerToolStripMenuItem";
-            this.explorerToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
-            this.explorerToolStripMenuItem.Text = "&Explorer";
+            this.explorerToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.explorerToolStripMenuItem.Text = "Browse in Windows &Explorer";
             this.explorerToolStripMenuItem.Click += new System.EventHandler(this.explorerToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(125, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(219, 6);
             // 
             // downloadToolStripMenuItem
             // 
             this.downloadToolStripMenuItem.Name = "downloadToolStripMenuItem";
-            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
             this.downloadToolStripMenuItem.Text = "&Download";
             this.downloadToolStripMenuItem.Click += new System.EventHandler(this.downloadToolStripMenuItem_Click);
             // 
@@ -424,6 +387,52 @@
             this.lblKeyword.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lblKeyword.Visible = false;
             // 
+            // lvwBooks
+            // 
+            this.lvwBooks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvwBooks.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lvwBooks.CheckBoxes = true;
+            this.lvwBooks.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.culOrder,
+            this.colTitle,
+            this.colLink,
+            this.colPath});
+            this.lvwBooks.ContextMenuStrip = this.mnuBookPopupMenu;
+            this.lvwBooks.FullRowSelect = true;
+            this.lvwBooks.GridLines = true;
+            this.lvwBooks.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lvwBooks.HideSelection = false;
+            this.lvwBooks.Location = new System.Drawing.Point(15, 233);
+            this.lvwBooks.Name = "lvwBooks";
+            this.lvwBooks.ShowItemToolTips = true;
+            this.lvwBooks.Size = new System.Drawing.Size(885, 146);
+            this.lvwBooks.TabIndex = 3;
+            this.lvwBooks.UseCompatibleStateImageBehavior = false;
+            this.lvwBooks.View = System.Windows.Forms.View.Details;
+            this.lvwBooks.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.lvwBooks_ItemChecked);
+            this.lvwBooks.SelectedIndexChanged += new System.EventHandler(this.lvwBooks_SelectedIndexChanged);
+            // 
+            // culOrder
+            // 
+            this.culOrder.Text = "#";
+            // 
+            // colTitle
+            // 
+            this.colTitle.Text = "Title";
+            this.colTitle.Width = 380;
+            // 
+            // colLink
+            // 
+            this.colLink.Text = "URL";
+            this.colLink.Width = 320;
+            // 
+            // colPath
+            // 
+            this.colPath.Text = "Local Path";
+            this.colPath.Width = 400;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -492,6 +501,7 @@
         private System.Windows.Forms.ToolStripMenuItem downloadToolStripMenuItem;
         private System.Windows.Forms.CheckBox chbGroupByKeyword;
         private System.Windows.Forms.Label lblKeyword;
+        private System.Windows.Forms.ToolStripMenuItem browseToolStripMenuItem;
     }
 }
 

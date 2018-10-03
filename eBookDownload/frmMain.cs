@@ -186,15 +186,17 @@ namespace eBookDownloader
                     item.ImageIndex = -1;
                     item.SubItems.Add(e.Title);
                     item.SubItems.Add(e.URL);
+                    lvwBooks.EnsureVisible(item.Index);
                     if (!lblKeyword.Visible)
                     {
                         progressBar.Width = lblKeyword.Left - progressBar.Left;
                         lblKeyword.Visible = true;
                     }
 
-                    if (lblKeyword.Text != e.Category)
+                    string category = WebUtility.UrlDecode(WebUtility.UrlDecode(e.Category));
+                    if (lblKeyword.Text != category)
                     {
-                        lblKeyword.Text = e.Category;
+                        lblKeyword.Text = category;
                         progressBar.Width = lblKeyword.Left - progressBar.Left;
                     }
 
@@ -793,6 +795,19 @@ namespace eBookDownloader
         private void frmMain_SizeChanged(object sender, EventArgs e)
         {
             progressBar.Width = lblKeyword.Left - progressBar.Left;
+        }
+
+        private void browseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lvwBooks.SelectedItems.Count <= 0)
+            {
+                return;
+            }
+
+            ListViewItem item = lvwBooks.SelectedItems[0];
+            BookEventArg book = item.Tag as BookEventArg;
+
+            Process.Start(book.URL);
         }
     }
 }

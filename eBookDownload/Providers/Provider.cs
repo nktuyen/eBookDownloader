@@ -8,6 +8,7 @@ using System.Xml.XPath;
 using System.Windows.Forms;
 using System.IO;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace eBookDownloader
 {
@@ -156,6 +157,35 @@ namespace eBookDownloader
             _downloaders.Remove(file.URL);
         }
 
+        private bool EnsureDirectoryExist(string filePath)
+        {
+            int pos = filePath.LastIndexOf("\\");
+            string strPath = string.Empty;
+
+            if (pos > 0)
+                strPath = filePath.Substring(0, pos);
+            else
+                strPath = filePath;
+
+            bool res = true;
+            if (!System.IO.Directory.Exists(strPath))
+            {
+                try
+                {
+                    DirectoryInfo di = System.IO.Directory.CreateDirectory(strPath);
+                    if (di != null && di.Exists)
+                        res = true;
+                }
+                catch(Exception ex)
+                {
+                    Debug.Print(ex.Message);
+                    res = false;
+                }
+            }
+
+            return res;
+        }
+
         protected void DownloadBook(BookEventArg e)
         {
             if (IsCancel)
@@ -214,8 +244,15 @@ namespace eBookDownloader
 
                 try
                 {
-                    webClient.DownloadFile(new Uri(e.URL), e.Path);
-                    e.Status = 0;
+                    if (EnsureDirectoryExist(e.Path))
+                    {
+                        webClient.DownloadFile(new Uri(e.URL), e.Path);
+                        e.Status = 0;
+                    }
+                    else
+                    {
+                        e.Status = -1;
+                    }
                     e.Progress = 100;
                     BookDownloadCompleted?.Invoke(this, e);
                     return;

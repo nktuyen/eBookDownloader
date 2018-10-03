@@ -589,7 +589,11 @@ namespace eBookDownloader
 
         private void btnRemoveKeyword_Click(object sender, EventArgs e)
         {
-            lbKeywords.Items.RemoveAt(lbKeywords.SelectedIndex);
+            int idx = lbKeywords.SelectedIndex;
+            lbKeywords.Items.RemoveAt(idx);
+            if (lbKeywords.Items.Count > idx)
+                lbKeywords.SelectedIndex = idx;
+
             btnRemoveKeyword.Enabled = lbKeywords.SelectedIndex != -1;
             btnSearch.Enabled = (txtKeyword.Text != string.Empty && radInputKeyword.Checked) || (lbKeywords.SelectedIndex != -1 && radSelectedKeywords.Checked);
         }

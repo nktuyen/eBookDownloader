@@ -21,6 +21,7 @@ namespace eBookDownloader
     {
         private Work Work { get; set; }
         private Dictionary<string, BookEventArg> _files = new Dictionary<string, BookEventArg>();
+        private Dictionary<Control, bool> _controlStates = new Dictionary<Control, bool>();
 
         private bool CanOpenFile
         {
@@ -49,6 +50,21 @@ namespace eBookDownloader
         private static bool IsChecked(ListViewItem item)
         {
             return item.Checked;
+        }
+
+        private void DisableControl(Control control)
+        {
+            _controlStates[control] = control.Enabled;
+            control.Enabled = false;
+        }
+
+        private void RestoreControlState(Control control)
+        {
+            if (_controlStates.ContainsKey(control))
+            {
+                control.Enabled = _controlStates[control];
+                _controlStates.Remove(control);
+            }
         }
 
         private static bool IsUnChecked(ListViewItem item)
@@ -391,18 +407,20 @@ namespace eBookDownloader
                 lvwBooks.Items.Clear();
                 chbCheckUnCheckAll.Checked = false;
                 progressBar.Visible = true;
-                chbAutoDownload.Enabled = false;
-                radSelectedKeywords.Enabled = false;
-                radInputKeyword.Enabled = false;
-                chbCheckUnCheckAll.Enabled = false;
-                cbbProviders.Enabled = false;
-                lbKeywords.Enabled = false;
-                txtKeyword.Enabled = false;
-                lvwBooks.Enabled = false;
-                btnBrowseWorkingDir.Enabled = false;
-                chbOverwritenDownload.Enabled = false;
-                chbGroupByKeyword.Enabled = false;
-                //lblKeyword.Visible = true;
+                DisableControl(chbAutoDownload);
+                DisableControl(radSelectedKeywords);
+                DisableControl(radInputKeyword);
+                DisableControl(chbCheckUnCheckAll);
+                DisableControl(cbbProviders);
+                DisableControl(lbKeywords);
+                DisableControl(txtKeyword);
+                DisableControl(lvwBooks);
+                DisableControl(btnBrowseWorkingDir);
+                DisableControl(chbOverwritenDownload);
+                DisableControl(chbGroupByKeyword);
+                DisableControl(btnAddKeyword);
+                DisableControl(btnRemoveKeyword);
+                DisableControl(btnClearKeywords);
                 progressBar.Width = lvwBooks.Width;
                 chbCheckUnCheckAll.Visible = false;
                 _files.Clear();
@@ -436,14 +454,17 @@ namespace eBookDownloader
             else
             {
                 progressBar.Visible = false;
-                chbAutoDownload.Enabled = true;
-                chbCheckUnCheckAll.Enabled = true;
-                cbbProviders.Enabled = true;
+                RestoreControlState(chbAutoDownload);
+                RestoreControlState(chbCheckUnCheckAll);
+                RestoreControlState(cbbProviders);
                 txtKeyword.Enabled = radInputKeyword.Checked;
                 lbKeywords.Enabled = radSelectedKeywords.Checked;
-                btnBrowseWorkingDir.Enabled = true;
-                chbOverwritenDownload.Enabled = true;
-                chbGroupByKeyword.Enabled = true;
+                RestoreControlState(btnBrowseWorkingDir);
+                RestoreControlState(chbOverwritenDownload);
+                RestoreControlState(chbGroupByKeyword);
+                RestoreControlState(btnAddKeyword);
+                RestoreControlState(btnRemoveKeyword);
+                RestoreControlState(btnClearKeywords);
                 lblKeyword.Visible = false;
                 lblKeyword.Text = string.Empty;
                 chbCheckUnCheckAll.Visible = true;

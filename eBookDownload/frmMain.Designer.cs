@@ -41,7 +41,7 @@
             this.radSelectedKeywords = new System.Windows.Forms.RadioButton();
             this.radInputKeyword = new System.Windows.Forms.RadioButton();
             this.txtKeyword = new System.Windows.Forms.TextBox();
-            this.lvwBooks = new System.Windows.Forms.ListView();
+            this.lvwBooks = new  ListViewEx();
             this.culOrder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colLink = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -464,7 +464,7 @@
         private System.Windows.Forms.TextBox txtKeyword;
         private System.Windows.Forms.RadioButton radSelectedKeywords;
         private System.Windows.Forms.ListBox lbKeywords;
-        private System.Windows.Forms.ListView lvwBooks;
+        private ListViewEx lvwBooks;
         private System.Windows.Forms.ColumnHeader culOrder;
         private System.Windows.Forms.ColumnHeader colTitle;
         private System.Windows.Forms.ColumnHeader colLink;

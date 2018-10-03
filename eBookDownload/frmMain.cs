@@ -170,6 +170,17 @@ namespace eBookDownloader
                     item.ImageIndex = -1;
                     item.SubItems.Add(e.Title);
                     item.SubItems.Add(e.URL);
+                    if (!lblKeyword.Visible)
+                    {
+                        progressBar.Width = lblKeyword.Left - progressBar.Left;
+                        lblKeyword.Visible = true;
+                    }
+
+                    if (lblKeyword.Text != e.Category)
+                    {
+                        lblKeyword.Text = e.Category;
+                        progressBar.Width = lblKeyword.Left - progressBar.Left;
+                    }
 
                     e.Overwriten = chbOverwritenDownload.Checked;
                     e.Download = chbAutoDownload.Checked;
@@ -371,7 +382,7 @@ namespace eBookDownloader
                 lbKeywords.InvokeRequired || txtKeyword.InvokeRequired ||
                 lvwBooks.InvokeRequired || chbCheckUnCheckAll.InvokeRequired ||
                 btnBrowseWorkingDir.InvokeRequired || chbOverwritenDownload.InvokeRequired ||
-                chbGroupByKeyword.InvokeRequired)
+                chbGroupByKeyword.InvokeRequired || lblKeyword.InvokeRequired)
             {
                 this.Invoke(new Action(OnSearchWorkerStart), new object[] { });
             }
@@ -391,6 +402,9 @@ namespace eBookDownloader
                 btnBrowseWorkingDir.Enabled = false;
                 chbOverwritenDownload.Enabled = false;
                 chbGroupByKeyword.Enabled = false;
+                //lblKeyword.Visible = true;
+                progressBar.Width = lvwBooks.Width;
+                chbCheckUnCheckAll.Visible = false;
                 _files.Clear();
 
                 if (Work == Work.eSearching)
@@ -415,7 +429,7 @@ namespace eBookDownloader
                 lbKeywords.InvokeRequired || txtKeyword.InvokeRequired ||
                 lvwBooks.InvokeRequired || chbCheckUnCheckAll.InvokeRequired || 
                 btnBrowseWorkingDir.InvokeRequired ||chbOverwritenDownload.InvokeRequired ||
-                chbGroupByKeyword.InvokeRequired)
+                chbGroupByKeyword.InvokeRequired || lblKeyword.InvokeRequired)
             {
                 this.Invoke(new Action(OnSearchWorkerFinish), new object[] { });
             }
@@ -430,7 +444,11 @@ namespace eBookDownloader
                 btnBrowseWorkingDir.Enabled = true;
                 chbOverwritenDownload.Enabled = true;
                 chbGroupByKeyword.Enabled = true;
+                lblKeyword.Visible = false;
+                lblKeyword.Text = string.Empty;
+                chbCheckUnCheckAll.Visible = true;
                 radSelectedKeywords.Enabled = radInputKeyword.Enabled = cbbProviders.SelectedIndex != -1;
+
                 if (radSelectedKeywords.Checked)
                     lbKeywords_SelectedIndexChanged(this, new EventArgs());
                 else
@@ -749,6 +767,11 @@ namespace eBookDownloader
                     OnFileFound(this, book);
                 }
             }
+        }
+
+        private void frmMain_SizeChanged(object sender, EventArgs e)
+        {
+            progressBar.Width = lblKeyword.Left - progressBar.Left;
         }
     }
 }

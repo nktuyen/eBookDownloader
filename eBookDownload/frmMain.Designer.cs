@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.label1 = new System.Windows.Forms.Label();
             this.cbbProviders = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -44,13 +45,27 @@
             this.culOrder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colLink = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.mnuBookPopupMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.explorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.downloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.chbCheckUnCheckAll = new System.Windows.Forms.CheckBox();
             this.searchWorker = new System.ComponentModel.BackgroundWorker();
             this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.btnDownload = new System.Windows.Forms.Button();
             this.downloadWorker = new System.ComponentModel.BackgroundWorker();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.chbGroupByKeyword = new System.Windows.Forms.CheckBox();
+            this.btnBrowseWorkingDir = new System.Windows.Forms.Button();
+            this.txtWorkingDirectory = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.chbOverwritenDownload = new System.Windows.Forms.CheckBox();
+            this.btnDownload = new System.Windows.Forms.Button();
+            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox1.SuspendLayout();
+            this.mnuBookPopupMenu.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -58,9 +73,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(44, 13);
+            this.label1.Size = new System.Drawing.Size(49, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Source:";
+            this.label1.Text = "Provider:";
             // 
             // cbbProviders
             // 
@@ -68,14 +83,16 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbbProviders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbbProviders.FormattingEnabled = true;
-            this.cbbProviders.Location = new System.Drawing.Point(89, 6);
+            this.cbbProviders.Location = new System.Drawing.Point(79, 6);
             this.cbbProviders.Name = "cbbProviders";
-            this.cbbProviders.Size = new System.Drawing.Size(435, 21);
+            this.cbbProviders.Size = new System.Drawing.Size(821, 21);
             this.cbbProviders.TabIndex = 1;
             this.cbbProviders.SelectedIndexChanged += new System.EventHandler(this.cbbProviders_SelectedIndexChanged);
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.chbAutoDownload);
             this.groupBox1.Controls.Add(this.btnSearch);
             this.groupBox1.Controls.Add(this.btnClearKeywords);
@@ -85,9 +102,9 @@
             this.groupBox1.Controls.Add(this.radSelectedKeywords);
             this.groupBox1.Controls.Add(this.radInputKeyword);
             this.groupBox1.Controls.Add(this.txtKeyword);
-            this.groupBox1.Location = new System.Drawing.Point(15, 43);
+            this.groupBox1.Location = new System.Drawing.Point(15, 47);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(509, 210);
+            this.groupBox1.Size = new System.Drawing.Size(438, 179);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Search";
@@ -95,17 +112,17 @@
             // chbAutoDownload
             // 
             this.chbAutoDownload.AutoSize = true;
-            this.chbAutoDownload.Location = new System.Drawing.Point(64, 129);
+            this.chbAutoDownload.Location = new System.Drawing.Point(292, 148);
             this.chbAutoDownload.Name = "chbAutoDownload";
-            this.chbAutoDownload.Size = new System.Drawing.Size(74, 17);
+            this.chbAutoDownload.Size = new System.Drawing.Size(131, 17);
             this.chbAutoDownload.TabIndex = 7;
-            this.chbAutoDownload.Text = "Download";
+            this.chbAutoDownload.Text = "Download immediately";
             this.chbAutoDownload.UseVisualStyleBackColor = true;
             // 
             // btnSearch
             // 
             this.btnSearch.Enabled = false;
-            this.btnSearch.Location = new System.Drawing.Point(64, 92);
+            this.btnSearch.Location = new System.Drawing.Point(185, 140);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(101, 31);
             this.btnSearch.TabIndex = 6;
@@ -115,8 +132,9 @@
             // 
             // btnClearKeywords
             // 
+            this.btnClearKeywords.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClearKeywords.Enabled = false;
-            this.btnClearKeywords.Location = new System.Drawing.Point(433, 110);
+            this.btnClearKeywords.Location = new System.Drawing.Point(362, 110);
             this.btnClearKeywords.Name = "btnClearKeywords";
             this.btnClearKeywords.Size = new System.Drawing.Size(57, 23);
             this.btnClearKeywords.TabIndex = 4;
@@ -126,8 +144,9 @@
             // 
             // btnRemoveKeyword
             // 
+            this.btnRemoveKeyword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRemoveKeyword.Enabled = false;
-            this.btnRemoveKeyword.Location = new System.Drawing.Point(434, 81);
+            this.btnRemoveKeyword.Location = new System.Drawing.Point(363, 81);
             this.btnRemoveKeyword.Name = "btnRemoveKeyword";
             this.btnRemoveKeyword.Size = new System.Drawing.Size(56, 23);
             this.btnRemoveKeyword.TabIndex = 4;
@@ -137,8 +156,9 @@
             // 
             // btnAddKeyword
             // 
+            this.btnAddKeyword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAddKeyword.Enabled = false;
-            this.btnAddKeyword.Location = new System.Drawing.Point(434, 52);
+            this.btnAddKeyword.Location = new System.Drawing.Point(363, 52);
             this.btnAddKeyword.Name = "btnAddKeyword";
             this.btnAddKeyword.Size = new System.Drawing.Size(56, 23);
             this.btnAddKeyword.TabIndex = 4;
@@ -148,12 +168,14 @@
             // 
             // lbKeywords
             // 
+            this.lbKeywords.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbKeywords.Enabled = false;
             this.lbKeywords.FormattingEnabled = true;
             this.lbKeywords.Location = new System.Drawing.Point(185, 52);
             this.lbKeywords.Name = "lbKeywords";
             this.lbKeywords.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.lbKeywords.Size = new System.Drawing.Size(241, 108);
+            this.lbKeywords.Size = new System.Drawing.Size(170, 82);
             this.lbKeywords.TabIndex = 3;
             this.lbKeywords.SelectedIndexChanged += new System.EventHandler(this.lbKeywords_SelectedIndexChanged);
             this.lbKeywords.DoubleClick += new System.EventHandler(this.lbKeywords_DoubleClick);
@@ -186,10 +208,12 @@
             // 
             // txtKeyword
             // 
+            this.txtKeyword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtKeyword.Enabled = false;
             this.txtKeyword.Location = new System.Drawing.Point(185, 28);
             this.txtKeyword.Name = "txtKeyword";
-            this.txtKeyword.Size = new System.Drawing.Size(305, 20);
+            this.txtKeyword.Size = new System.Drawing.Size(234, 20);
             this.txtKeyword.TabIndex = 1;
             this.txtKeyword.TextChanged += new System.EventHandler(this.txtKeyword_TextChanged);
             // 
@@ -204,13 +228,16 @@
             this.culOrder,
             this.colTitle,
             this.colLink,
-            this.colStatus});
+            this.colPath});
+            this.lvwBooks.ContextMenuStrip = this.mnuBookPopupMenu;
             this.lvwBooks.FullRowSelect = true;
             this.lvwBooks.GridLines = true;
-            this.lvwBooks.Location = new System.Drawing.Point(15, 259);
+            this.lvwBooks.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lvwBooks.HideSelection = false;
+            this.lvwBooks.Location = new System.Drawing.Point(15, 233);
             this.lvwBooks.Name = "lvwBooks";
             this.lvwBooks.ShowItemToolTips = true;
-            this.lvwBooks.Size = new System.Drawing.Size(872, 195);
+            this.lvwBooks.Size = new System.Drawing.Size(885, 146);
             this.lvwBooks.TabIndex = 3;
             this.lvwBooks.UseCompatibleStateImageBehavior = false;
             this.lvwBooks.View = System.Windows.Forms.View.Details;
@@ -224,23 +251,60 @@
             // colTitle
             // 
             this.colTitle.Text = "Title";
-            this.colTitle.Width = 360;
+            this.colTitle.Width = 380;
             // 
             // colLink
             // 
             this.colLink.Text = "URL";
-            this.colLink.Width = 360;
+            this.colLink.Width = 320;
             // 
-            // colStatus
+            // colPath
             // 
-            this.colStatus.Text = "Status";
-            this.colStatus.Width = 120;
+            this.colPath.Text = "Local Path";
+            this.colPath.Width = 400;
+            // 
+            // mnuBookPopupMenu
+            // 
+            this.mnuBookPopupMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.explorerToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.downloadToolStripMenuItem});
+            this.mnuBookPopupMenu.Name = "mnuBookPopupMenu";
+            this.mnuBookPopupMenu.Size = new System.Drawing.Size(129, 76);
+            this.mnuBookPopupMenu.Opening += new System.ComponentModel.CancelEventHandler(this.mnuBookPopupMenu_Opening);
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.openToolStripMenuItem.Text = "&Open";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            // 
+            // explorerToolStripMenuItem
+            // 
+            this.explorerToolStripMenuItem.Name = "explorerToolStripMenuItem";
+            this.explorerToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.explorerToolStripMenuItem.Text = "&Explorer";
+            this.explorerToolStripMenuItem.Click += new System.EventHandler(this.explorerToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(125, 6);
+            // 
+            // downloadToolStripMenuItem
+            // 
+            this.downloadToolStripMenuItem.Name = "downloadToolStripMenuItem";
+            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.downloadToolStripMenuItem.Text = "&Download";
+            this.downloadToolStripMenuItem.Click += new System.EventHandler(this.downloadToolStripMenuItem_Click);
             // 
             // chbCheckUnCheckAll
             // 
             this.chbCheckUnCheckAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbCheckUnCheckAll.AutoSize = true;
-            this.chbCheckUnCheckAll.Location = new System.Drawing.Point(15, 460);
+            this.chbCheckUnCheckAll.Location = new System.Drawing.Point(15, 386);
             this.chbCheckUnCheckAll.Name = "chbCheckUnCheckAll";
             this.chbCheckUnCheckAll.Size = new System.Drawing.Size(120, 17);
             this.chbCheckUnCheckAll.TabIndex = 6;
@@ -258,25 +322,13 @@
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(15, 458);
+            this.progressBar.Location = new System.Drawing.Point(15, 384);
             this.progressBar.MarqueeAnimationSpeed = 10;
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(872, 18);
+            this.progressBar.Size = new System.Drawing.Size(885, 18);
             this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.progressBar.TabIndex = 7;
             this.progressBar.Visible = false;
-            // 
-            // btnDownload
-            // 
-            this.btnDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(893, 298);
-            this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(101, 31);
-            this.btnDownload.TabIndex = 9;
-            this.btnDownload.Text = "Download";
-            this.btnDownload.UseVisualStyleBackColor = true;
-            this.btnDownload.Click += new System.EventHandler(this.btnDownload_Click);
             // 
             // downloadWorker
             // 
@@ -284,19 +336,95 @@
             this.downloadWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.downloadWorker_ProgressChanged);
             this.downloadWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.downloadWorker_RunWorkerCompleted);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.chbGroupByKeyword);
+            this.groupBox2.Controls.Add(this.btnBrowseWorkingDir);
+            this.groupBox2.Controls.Add(this.txtWorkingDirectory);
+            this.groupBox2.Controls.Add(this.label2);
+            this.groupBox2.Controls.Add(this.chbOverwritenDownload);
+            this.groupBox2.Controls.Add(this.btnDownload);
+            this.groupBox2.Location = new System.Drawing.Point(459, 47);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(441, 179);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Download Options";
+            // 
+            // chbGroupByKeyword
+            // 
+            this.chbGroupByKeyword.AutoSize = true;
+            this.chbGroupByKeyword.Location = new System.Drawing.Point(42, 86);
+            this.chbGroupByKeyword.Name = "chbGroupByKeyword";
+            this.chbGroupByKeyword.Size = new System.Drawing.Size(144, 17);
+            this.chbGroupByKeyword.TabIndex = 15;
+            this.chbGroupByKeyword.Text = "Group books by keyword";
+            this.chbGroupByKeyword.UseVisualStyleBackColor = true;
+            this.chbGroupByKeyword.CheckedChanged += new System.EventHandler(this.chbGroupByKeyword_CheckedChanged);
+            // 
+            // btnBrowseWorkingDir
+            // 
+            this.btnBrowseWorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBrowseWorkingDir.Location = new System.Drawing.Point(414, 26);
+            this.btnBrowseWorkingDir.Name = "btnBrowseWorkingDir";
+            this.btnBrowseWorkingDir.Size = new System.Drawing.Size(23, 23);
+            this.btnBrowseWorkingDir.TabIndex = 14;
+            this.btnBrowseWorkingDir.Text = "...";
+            this.btnBrowseWorkingDir.UseVisualStyleBackColor = true;
+            this.btnBrowseWorkingDir.Click += new System.EventHandler(this.btnBrowseWorkingDir_Click);
+            // 
+            // txtWorkingDirectory
+            // 
+            this.txtWorkingDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtWorkingDirectory.Location = new System.Drawing.Point(144, 28);
+            this.txtWorkingDirectory.Name = "txtWorkingDirectory";
+            this.txtWorkingDirectory.ReadOnly = true;
+            this.txtWorkingDirectory.Size = new System.Drawing.Size(267, 20);
+            this.txtWorkingDirectory.TabIndex = 13;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(42, 31);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(95, 13);
+            this.label2.TabIndex = 12;
+            this.label2.Text = "Working Directory:";
+            // 
+            // chbOverwritenDownload
+            // 
+            this.chbOverwritenDownload.AutoSize = true;
+            this.chbOverwritenDownload.Location = new System.Drawing.Point(42, 58);
+            this.chbOverwritenDownload.Name = "chbOverwritenDownload";
+            this.chbOverwritenDownload.Size = new System.Drawing.Size(136, 17);
+            this.chbOverwritenDownload.TabIndex = 11;
+            this.chbOverwritenDownload.Text = "Overwriten existing files";
+            this.chbOverwritenDownload.UseVisualStyleBackColor = true;
+            // 
+            // btnDownload
+            // 
+            this.btnDownload.Enabled = false;
+            this.btnDownload.Location = new System.Drawing.Point(195, 140);
+            this.btnDownload.Name = "btnDownload";
+            this.btnDownload.Size = new System.Drawing.Size(101, 31);
+            this.btnDownload.TabIndex = 10;
+            this.btnDownload.Text = "Download";
+            this.btnDownload.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1000, 479);
-            this.Controls.Add(this.btnDownload);
+            this.ClientSize = new System.Drawing.Size(912, 405);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.chbCheckUnCheckAll);
             this.Controls.Add(this.lvwBooks);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.cbbProviders);
             this.Controls.Add(this.label1);
-            this.MinimumSize = new System.Drawing.Size(600, 360);
+            this.MinimumSize = new System.Drawing.Size(928, 444);
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "eBookDownloader";
@@ -305,6 +433,9 @@
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.mnuBookPopupMenu.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -326,14 +457,26 @@
         private System.Windows.Forms.CheckBox chbCheckUnCheckAll;
         private System.ComponentModel.BackgroundWorker searchWorker;
         private System.Windows.Forms.ProgressBar progressBar;
-        private System.Windows.Forms.Button btnDownload;
         private System.ComponentModel.BackgroundWorker downloadWorker;
-        private System.Windows.Forms.ColumnHeader colStatus;
+        private System.Windows.Forms.ColumnHeader colPath;
         private System.Windows.Forms.Button btnClearKeywords;
         private System.Windows.Forms.Button btnRemoveKeyword;
         private System.Windows.Forms.Button btnAddKeyword;
         private System.Windows.Forms.CheckBox chbAutoDownload;
         private System.Windows.Forms.Button btnSearch;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button btnDownload;
+        private System.Windows.Forms.CheckBox chbOverwritenDownload;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txtWorkingDirectory;
+        private System.Windows.Forms.Button btnBrowseWorkingDir;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+        private System.Windows.Forms.ContextMenuStrip mnuBookPopupMenu;
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem explorerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem downloadToolStripMenuItem;
+        private System.Windows.Forms.CheckBox chbGroupByKeyword;
     }
 }
 

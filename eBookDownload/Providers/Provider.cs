@@ -224,13 +224,17 @@ namespace eBookDownloader
 
                 if(File.Exists(e.Path))
                 {
-                    BookDownloadingFileExist?.Invoke(this, e);
-                    if (!e.Overwriten)
+                    System.IO.FileInfo fi = new FileInfo(e.Path);
+                    if (fi.Length > 0)
                     {
-                        e.Status = 0;
-                        e.Progress = 100;
-                        BookDownloadCompleted?.Invoke(this, e);
-                        return;
+                        BookDownloadingFileExist?.Invoke(this, e);
+                        if (!e.Overwriten)
+                        {
+                            e.Status = 0;
+                            e.Progress = 100;
+                            BookDownloadCompleted?.Invoke(this, e);
+                            return;
+                        }
                     }
                 }
 

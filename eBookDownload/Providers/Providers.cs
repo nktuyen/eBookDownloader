@@ -27,8 +27,11 @@ namespace eBookDownloader
             if (null == _providers)
             {
                 _providers = new Dictionary<string, Provider>();
-                Provider downloader = SachLapTrinhDotCom_Provider.GetInstance();
-                _providers.Add(downloader.Name, downloader);
+                Provider provider = SachLapTrinhDotCom_Provider.GetInstance();
+                _providers.Add(provider.Name, provider);
+
+                provider = AlLiteBookDotCom_Provider.GetInstance();
+                _providers.Add(provider.Name, provider);
             }
         }
 

@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlLiteBookDotCom_Provider.cs" />
     <Compile Include="ListViewEx.cs">
       <SubType>Component</SubType>
     </Compile>

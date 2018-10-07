@@ -54,7 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlLiteBookDotCom_Provider.cs" />
+    <Compile Include="Providers\AlLiteBookDotCom_Provider.cs" />
     <Compile Include="ListViewEx.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -78,7 +78,7 @@
     <Compile Include="KeywordCache.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SachLapTrinhDotCom_Provider.cs" />
+    <Compile Include="Providers\SachLapTrinhDotCom_Provider.cs" />
     <EmbeddedResource Include="frmInputKeyword.resx">
       <DependentUpon>frmInputKeyword.cs</DependentUpon>
     </EmbeddedResource>

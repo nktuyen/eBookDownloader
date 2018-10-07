@@ -44,13 +44,13 @@ namespace eBookDownloader
                 StreamReader reader = new StreamReader(html);
                 string htmlString = reader.ReadToEnd();
 
-                string strScriptOpen = "<h2>";
-                string strScripClose = "</h2>";
+                string strScriptOpen = "<div class=\"pagination clearfix\">";
+                string strScripClose = "</div>";
                 int first = htmlString.IndexOf(strScriptOpen, 0);
                 int last = 0;
                 bool bFoundCloseTag = false;
                 string code = string.Empty;
-                int ff = 0, ll = 0, pgs = 0;
+                int ff = 0, ll = 0, pgs = 1;
                 while (first < htmlString.Length)
                 {
                     if (IsCancel)
@@ -65,15 +65,24 @@ namespace eBookDownloader
                     }
 
                     code = htmlString.Substring(first + strScriptOpen.Length, last - first - (bFoundCloseTag ? strScripClose.Length : 0));
-                    ff = code.IndexOf("totalPages:");
+                    ff = code.IndexOf("<span class=\"pages\">");
                     if (ff > 0)
                     {
-                        ff += "totalPages:".Length;
-                        ll = code.IndexOf(",", ff);
+                        ff += "<span class=\"pages\">".Length;
+                        ll = code.IndexOf("</span>", ff);
                         if (ll > ff)
                         {
                             string str = code.Substring(ff + 1, ll - ff - 1);
-                            if (int.TryParse(str.Trim(), out pgs))
+                            string subStr = str;
+
+                            ff = str.LastIndexOf("/");
+                            subStr = str.Substring(ff + 1);
+                            str = subStr.Trim();
+                            ll = str.IndexOf(" ", ff + 1);
+                            if (ll < ff)
+                                ll = ff;
+                            subStr = str.Substring(0, ll - ff + 1);
+                            if (int.TryParse(subStr, out pgs))
                                 break;
                         }
                     }
@@ -104,18 +113,19 @@ namespace eBookDownloader
         protected override Dictionary<string, string> SearchInPage(int page)
         {
             Dictionary<string, string> files = new Dictionary<string, string>();
-            HttpWebRequest httpReq = WebRequest.Create(Home + _query + "&pageIndex=" + page) as HttpWebRequest;
+            HttpWebRequest httpReq = WebRequest.Create(Home + "/page/" + page + "/" + _query) as HttpWebRequest;
             if (httpReq != null)
             {
                 if (IsCancel)
                     return files;
+
                 WebResponse webResponse = httpReq.GetResponse();
                 Stream html = webResponse.GetResponseStream();
                 StreamReader reader = new StreamReader(html);
                 string htmlString = reader.ReadToEnd();
 
-                string strDIVOpen = "<div";
-                string strDIVClose = "</div>";
+                string strDIVOpen = "<h2";
+                string strDIVClose = "</h2>";
                 int first = htmlString.IndexOf(strDIVOpen, 0);
                 int last = 0;
                 string strhRef = string.Empty;
@@ -138,7 +148,7 @@ namespace eBookDownloader
                     }
 
                     code = htmlString.Substring(first + strDIVOpen.Length, last - first - (bFoundCloseTag ? strDIVClose.Length : 0));
-                    ff = code.IndexOf("class=\"book-image\"");
+                    ff = code.IndexOf("class=\"entry-title\"");
                     if (ff > 0)
                     {
                         ff = code.IndexOf("<a href=\"", ff);
@@ -179,7 +189,12 @@ namespace eBookDownloader
 
         protected override KeyValuePair<string, string> SearchLink(string link)
         {
-            HttpWebRequest httpReq = WebRequest.Create(Home + link) as HttpWebRequest;
+            string strHome = link.Substring(0, Home.Length);
+            string strURL = Home + link;
+            if (string.Compare(strHome, Home, true) == 0)
+                strURL = link;
+            
+            HttpWebRequest httpReq = WebRequest.Create(strURL) as HttpWebRequest;
             KeyValuePair<string, string> file = new KeyValuePair<string, string>();
             if (httpReq != null)
             {
@@ -189,85 +204,66 @@ namespace eBookDownloader
                 WebResponse webResponse = httpReq.GetResponse();
                 Stream html = webResponse.GetResponseStream();
                 StreamReader reader = new StreamReader(html);
-                string htmlString = reader.ReadToEnd();
+                string htmlString = reader.ReadToEnd();                
 
-
-                string strDIVOpen = "<div";
-                string strDIVClose = "</div>";
-                string signal = "<a target=\"_blank\" class=\"btn btn-block btn-sm btn-primary\" href=\"";
+                string strDIVOpen = "<h1 class=\"single-title\">";
+                string strDIVClose = "</h1>";
                 int first = htmlString.IndexOf(strDIVOpen, 0);
-                int last = 0;
+                int last = htmlString.IndexOf(strDIVClose, first+strDIVOpen.Length);
                 string strLink = string.Empty;
-                bool bFoundCloseTag = false;
-                string strhRef = string.Empty;
+                string strTemp = string.Empty;
                 string strTitle = string.Empty;
-                int ff = 0, ll = 0;
-                int ff2 = 0, ll2 = 0;
-                string bookPath = string.Empty;
-                while (first > 0 && first < htmlString.Length)
+
+                strURL = string.Empty;
+                
+                if(first > 0)
                 {
-                    if (IsCancel)
-                        return file;
-
-                    bFoundCloseTag = true;
-                    last = htmlString.IndexOf(strDIVClose, first + strDIVOpen.Length + 1);
-                    if ((last > htmlString.Length) || (-1 == last))
-                    {
+                    if (last < first)
                         last = htmlString.Length;
-                        bFoundCloseTag = false;
-                    }
 
-                    strhRef = htmlString.Substring(first + strDIVOpen.Length, last - first - (bFoundCloseTag ? strDIVClose.Length : 0));
+                    strTitle = htmlString.Substring(first+strDIVOpen.Length, last - first- strDIVOpen.Length).Trim();
+                }
 
-                    ff = strhRef.IndexOf("class=\"book-image\"");
-                    if (ff > 0)
+                strDIVOpen = "<span class=\"download-links\">";
+                strDIVClose = "</span>";
+
+                first = htmlString.IndexOf(strDIVOpen,first);
+                if (first > 0)
+                {
+                    last = htmlString.IndexOf(strDIVClose, first);
+                    if (last > first)
                     {
-                        ff = strhRef.IndexOf("<img alt=\"", ff);
-                        if ((ff > 0) && (ff < strhRef.Length))
+                        strDIVOpen = "<a href=\"";
+                        strDIVClose = "\"";
+                        first = htmlString.IndexOf(strDIVOpen, first);
+                        if (first > 0)
                         {
-                            ff += "<img alt=\"".Length;
-                            ll = strhRef.IndexOf("\"", ff);
-                            if ((ll > strhRef.Length) || (-1 == ll))
+                            last = htmlString.IndexOf(strDIVClose, first+strDIVOpen.Length);
+                            if (last > first)
                             {
-                                ll = strhRef.Length;
-                            }
-                            strTitle = strhRef.Substring(ff, ll - ff).Trim();
-                        }
-                    }
+                                strURL = htmlString.Substring(first + strDIVOpen.Length, last - first - strDIVOpen.Length);
+                                if (strURL.Length > 0)
+                                {
+                                    first = strURL.LastIndexOf("/");
+                                    last = strURL.LastIndexOf(".");
+                                    if (last < first)
+                                        last = strURL.Length;
 
-                    ff2 = strhRef.IndexOf(signal);
-                    if (ff2 > 0)
-                    {
-                        ff2 += signal.Length;
-                        ll2 = strhRef.IndexOf("\"", ff2);
-                        if (-1 != ll2)
-                        {
-                            strLink = strhRef.Substring(ff2, ll2 - ff2);
-                            if (strLink.Length > 0)
-                            {
-                                string strID = string.Empty;
-                                int nPos = strLink.LastIndexOf("/");
-                                int nStart = 0;
-                                int nEnd = strLink.Length;
-                                if (nPos > 0)
-                                    nStart = nPos + 1;
+                                    string strID = strURL.Substring(first, last - first + 1);
 
-                                nPos = strLink.LastIndexOf(".");
-                                if (nPos <= nStart)
-                                    nPos = strLink.Length;
-                                nEnd = nPos - 1;
+                                    if (strTitle == string.Empty)
+                                    {
+                                        strTitle = strID;
+                                    }
 
-                                strID = strLink.Substring(nStart, nEnd - nStart + 1);
-                                file = new KeyValuePair<string, string>(strLink, WebUtility.HtmlDecode(WebUtility.HtmlDecode(strTitle)));
-                                BookEventArg e = new BookEventArg(strID, file.Value, file.Key);
-                                OnBookFound(e);
-                                return file;
+                                    file = new KeyValuePair<string, string>(strURL, WebUtility.HtmlDecode(strTitle));
+                                    BookEventArg e = new BookEventArg(strID, file.Value, file.Key);
+                                    OnBookFound(e);
+                                    return file;
+                                }
                             }
                         }
                     }
-                    first = htmlString.IndexOf(strDIVOpen, last + (bFoundCloseTag ? strDIVClose.Length : 0) + 1);
-                    if (first < 0)
-                        break;
                 }
             }
             return new KeyValuePair<string, string>();

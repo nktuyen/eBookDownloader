@@ -813,5 +813,45 @@ namespace eBookDownloader
 
             Process.Start(book.URL);
         }
+
+        private void copyTitleMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lvwBooks.SelectedItems.Count <= 0)
+            {
+                return;
+            }
+
+            ListViewItem item = lvwBooks.SelectedItems[0];
+            BookEventArg book = item.Tag as BookEventArg;
+            try
+            {
+                Clipboard.Clear();
+                Clipboard.SetText(book.Title);
+            }
+            catch(Exception ex)
+            {
+                Debug.Print(ex.Message);
+            }
+        }
+
+        private void copyLinkMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lvwBooks.SelectedItems.Count <= 0)
+            {
+                return;
+            }
+
+            ListViewItem item = lvwBooks.SelectedItems[0];
+            BookEventArg book = item.Tag as BookEventArg;
+            try
+            {
+                Clipboard.Clear();
+                Clipboard.SetText(book.URL);
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+            }
+        }
     }
 }

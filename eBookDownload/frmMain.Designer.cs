@@ -42,6 +42,7 @@
             this.radInputKeyword = new System.Windows.Forms.RadioButton();
             this.txtKeyword = new System.Windows.Forms.TextBox();
             this.mnuBookPopupMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyTitleMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.browseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.explorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,6 +66,7 @@
             this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colLink = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.copyLinkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.mnuBookPopupMenu.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -222,14 +224,23 @@
             // mnuBookPopupMenu
             // 
             this.mnuBookPopupMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyTitleMenuItem,
+            this.copyLinkMenuItem,
             this.browseToolStripMenuItem,
             this.openToolStripMenuItem,
             this.explorerToolStripMenuItem,
             this.toolStripMenuItem1,
             this.downloadToolStripMenuItem});
             this.mnuBookPopupMenu.Name = "mnuBookPopupMenu";
-            this.mnuBookPopupMenu.Size = new System.Drawing.Size(223, 120);
+            this.mnuBookPopupMenu.Size = new System.Drawing.Size(223, 164);
             this.mnuBookPopupMenu.Opening += new System.ComponentModel.CancelEventHandler(this.mnuBookPopupMenu_Opening);
+            // 
+            // copyTitleMenuItem
+            // 
+            this.copyTitleMenuItem.Name = "copyTitleMenuItem";
+            this.copyTitleMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.copyTitleMenuItem.Text = "&Copy Title";
+            this.copyTitleMenuItem.Click += new System.EventHandler(this.copyTitleMenuItem_Click);
             // 
             // browseToolStripMenuItem
             // 
@@ -433,6 +444,13 @@
             this.colPath.Text = "Local Path";
             this.colPath.Width = 400;
             // 
+            // copyLinkMenuItem
+            // 
+            this.copyLinkMenuItem.Name = "copyLinkMenuItem";
+            this.copyLinkMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.copyLinkMenuItem.Text = "Copy &Link";
+            this.copyLinkMenuItem.Click += new System.EventHandler(this.copyLinkMenuItem_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -502,6 +520,8 @@
         private System.Windows.Forms.CheckBox chbGroupByKeyword;
         private System.Windows.Forms.Label lblKeyword;
         private System.Windows.Forms.ToolStripMenuItem browseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyTitleMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyLinkMenuItem;
     }
 }
 

@@ -43,10 +43,11 @@
             this.txtKeyword = new System.Windows.Forms.TextBox();
             this.mnuBookPopupMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyTitleMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.browseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.explorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.copyLinkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openLinkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.explorerFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.seperator1MenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.downloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.chbCheckUnCheckAll = new System.Windows.Forms.CheckBox();
             this.searchWorker = new System.ComponentModel.BackgroundWorker();
@@ -66,7 +67,6 @@
             this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colLink = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.copyLinkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.mnuBookPopupMenu.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -226,10 +226,10 @@
             this.mnuBookPopupMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.copyTitleMenuItem,
             this.copyLinkMenuItem,
-            this.browseToolStripMenuItem,
-            this.openToolStripMenuItem,
-            this.explorerToolStripMenuItem,
-            this.toolStripMenuItem1,
+            this.openLinkMenuItem,
+            this.openFileMenuItem,
+            this.explorerFileMenuItem,
+            this.seperator1MenuItem,
             this.downloadToolStripMenuItem});
             this.mnuBookPopupMenu.Name = "mnuBookPopupMenu";
             this.mnuBookPopupMenu.Size = new System.Drawing.Size(223, 164);
@@ -242,31 +242,38 @@
             this.copyTitleMenuItem.Text = "&Copy Title";
             this.copyTitleMenuItem.Click += new System.EventHandler(this.copyTitleMenuItem_Click);
             // 
-            // browseToolStripMenuItem
+            // copyLinkMenuItem
             // 
-            this.browseToolStripMenuItem.Name = "browseToolStripMenuItem";
-            this.browseToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.browseToolStripMenuItem.Text = "Open in &Web Browser";
-            this.browseToolStripMenuItem.Click += new System.EventHandler(this.browseToolStripMenuItem_Click);
+            this.copyLinkMenuItem.Name = "copyLinkMenuItem";
+            this.copyLinkMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.copyLinkMenuItem.Text = "Copy &Link";
+            this.copyLinkMenuItem.Click += new System.EventHandler(this.copyLinkMenuItem_Click);
             // 
-            // openToolStripMenuItem
+            // openLinkMenuItem
             // 
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.openToolStripMenuItem.Text = "&Open Local File";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            this.openLinkMenuItem.Name = "openLinkMenuItem";
+            this.openLinkMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.openLinkMenuItem.Text = "Open Link";
+            this.openLinkMenuItem.Click += new System.EventHandler(this.browseToolStripMenuItem_Click);
             // 
-            // explorerToolStripMenuItem
+            // openFileMenuItem
             // 
-            this.explorerToolStripMenuItem.Name = "explorerToolStripMenuItem";
-            this.explorerToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.explorerToolStripMenuItem.Text = "Browse in Windows &Explorer";
-            this.explorerToolStripMenuItem.Click += new System.EventHandler(this.explorerToolStripMenuItem_Click);
+            this.openFileMenuItem.Name = "openFileMenuItem";
+            this.openFileMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.openFileMenuItem.Text = "&Open Local File";
+            this.openFileMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
-            // toolStripMenuItem1
+            // explorerFileMenuItem
             // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(219, 6);
+            this.explorerFileMenuItem.Name = "explorerFileMenuItem";
+            this.explorerFileMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.explorerFileMenuItem.Text = "Browse in Windows &Explorer";
+            this.explorerFileMenuItem.Click += new System.EventHandler(this.explorerToolStripMenuItem_Click);
+            // 
+            // seperator1MenuItem
+            // 
+            this.seperator1MenuItem.Name = "seperator1MenuItem";
+            this.seperator1MenuItem.Size = new System.Drawing.Size(219, 6);
             // 
             // downloadToolStripMenuItem
             // 
@@ -424,32 +431,27 @@
             this.lvwBooks.View = System.Windows.Forms.View.Details;
             this.lvwBooks.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.lvwBooks_ItemChecked);
             this.lvwBooks.SelectedIndexChanged += new System.EventHandler(this.lvwBooks_SelectedIndexChanged);
+            this.lvwBooks.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvwBooks_MouseClick);
             // 
             // culOrder
             // 
             this.culOrder.Text = "#";
+            this.culOrder.Width = 70;
             // 
             // colTitle
             // 
             this.colTitle.Text = "Title";
-            this.colTitle.Width = 380;
+            this.colTitle.Width = 360;
             // 
             // colLink
             // 
             this.colLink.Text = "URL";
-            this.colLink.Width = 320;
+            this.colLink.Width = 360;
             // 
             // colPath
             // 
             this.colPath.Text = "Local Path";
             this.colPath.Width = 400;
-            // 
-            // copyLinkMenuItem
-            // 
-            this.copyLinkMenuItem.Name = "copyLinkMenuItem";
-            this.copyLinkMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.copyLinkMenuItem.Text = "Copy &Link";
-            this.copyLinkMenuItem.Click += new System.EventHandler(this.copyLinkMenuItem_Click);
             // 
             // frmMain
             // 
@@ -513,13 +515,13 @@
         private System.Windows.Forms.Button btnBrowseWorkingDir;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.ContextMenuStrip mnuBookPopupMenu;
-        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem explorerToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem openFileMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem explorerFileMenuItem;
+        private System.Windows.Forms.ToolStripSeparator seperator1MenuItem;
         private System.Windows.Forms.ToolStripMenuItem downloadToolStripMenuItem;
         private System.Windows.Forms.CheckBox chbGroupByKeyword;
         private System.Windows.Forms.Label lblKeyword;
-        private System.Windows.Forms.ToolStripMenuItem browseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openLinkMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyTitleMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyLinkMenuItem;
     }

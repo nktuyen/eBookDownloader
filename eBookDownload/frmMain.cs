@@ -22,6 +22,7 @@ namespace eBookDownloader
         private Work Work { get; set; }
         private Dictionary<string, BookEventArg> _files = new Dictionary<string, BookEventArg>();
         private Dictionary<Control, bool> _controlStates = new Dictionary<Control, bool>();
+        private Point _lastMousePos;
 
         private bool CanOpenFile
         {
@@ -95,6 +96,8 @@ namespace eBookDownloader
 
                     provider = Providers.Instance.Next();
                 }
+
+                cbbProviders.SelectedIndex = 0;
             }
 
             lbKeywords.Items.Clear();
@@ -562,6 +565,17 @@ namespace eBookDownloader
             }
         }
 
+        private bool HitTestListColumn(int nCol)
+        {
+            ListViewHitTestInfo hi = lvwBooks.HitTest(_lastMousePos);
+            if ((hi != null)&&(hi.Location== ListViewHitTestLocations.Label))
+            {
+                return hi.Item.SubItems[nCol] == hi.SubItem;
+            }
+
+            return false;
+        }
+
         private void lvwBooks_SelectedIndexChanged(object sender, EventArgs e)
         {
 
@@ -779,8 +793,11 @@ namespace eBookDownloader
         private void mnuBookPopupMenu_Opening(object sender, CancelEventArgs e)
         {
             e.Cancel = lvwBooks.SelectedIndices.Count <= 0;
-            openToolStripMenuItem.Visible = CanOpenFile;
-            explorerToolStripMenuItem.Visible = CanOpenFile;
+            openFileMenuItem.Visible = CanOpenFile && HitTestListColumn(3);
+            explorerFileMenuItem.Visible = CanOpenFile && HitTestListColumn(3);
+            openLinkMenuItem.Visible = HitTestListColumn(2);
+            copyTitleMenuItem.Visible = HitTestListColumn(1);
+            copyLinkMenuItem.Visible = HitTestListColumn(2);
         }
 
         private void chbGroupByKeyword_CheckedChanged(object sender, EventArgs e)
@@ -828,7 +845,7 @@ namespace eBookDownloader
                 Clipboard.Clear();
                 Clipboard.SetText(book.Title);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.Print(ex.Message);
             }
@@ -851,6 +868,14 @@ namespace eBookDownloader
             catch (Exception ex)
             {
                 Debug.Print(ex.Message);
+            }
+        }
+
+        private void lvwBooks_MouseClick(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+            {
+                _lastMousePos = e.Location;
             }
         }
     }

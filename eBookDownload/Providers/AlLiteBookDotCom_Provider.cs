@@ -86,6 +86,11 @@ namespace eBookDownloader
                                 break;
                         }
                     }
+                    else
+                    {
+                        pgs = 1;
+                        break;
+                    }
                     first = htmlString.IndexOf(strScriptOpen, last + (bFoundCloseTag ? strScripClose.Length : 0) + 1);
                 }
 

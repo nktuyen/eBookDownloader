@@ -159,28 +159,33 @@ namespace eBookDownloader
 
         private bool EnsureDirectoryExist(string filePath)
         {
-            int pos = filePath.LastIndexOf("\\");
+            int pos = filePath.IndexOf("\\");
             string strPath = string.Empty;
-
-            if (pos > 0)
-                strPath = filePath.Substring(0, pos);
-            else
-                strPath = filePath;
-
             bool res = true;
-            if (!System.IO.Directory.Exists(strPath))
+
+            while (pos > 0 && pos < filePath.Length)
             {
-                try
+                if (pos > 0)
+                    strPath = filePath.Substring(0, pos);
+                else
+                    strPath = filePath;
+
+                if (!System.IO.Directory.Exists(strPath))
                 {
-                    DirectoryInfo di = System.IO.Directory.CreateDirectory(strPath);
-                    if (di != null && di.Exists)
-                        res = true;
+                    try
+                    {
+                        DirectoryInfo di = System.IO.Directory.CreateDirectory(strPath);
+                        if (di != null && di.Exists)
+                            res = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Print(ex.Message);
+                        res = false;
+                    }
                 }
-                catch(Exception ex)
-                {
-                    Debug.Print(ex.Message);
-                    res = false;
-                }
+
+                pos = filePath.IndexOf("\\", pos+1);
             }
 
             return res;

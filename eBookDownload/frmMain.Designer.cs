@@ -49,6 +49,7 @@
             this.explorerFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.seperator1MenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.downloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportListMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.chbCheckUnCheckAll = new System.Windows.Forms.CheckBox();
             this.searchWorker = new System.ComponentModel.BackgroundWorker();
             this.progressBar = new System.Windows.Forms.ProgressBar();
@@ -62,6 +63,7 @@
             this.btnDownload = new System.Windows.Forms.Button();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.lblKeyword = new System.Windows.Forms.Label();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.lvwBooks = new eBookDownloader.ListViewEx();
             this.culOrder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -230,57 +232,65 @@
             this.openFileMenuItem,
             this.explorerFileMenuItem,
             this.seperator1MenuItem,
-            this.downloadToolStripMenuItem});
+            this.downloadToolStripMenuItem,
+            this.exportListMenuItem});
             this.mnuBookPopupMenu.Name = "mnuBookPopupMenu";
-            this.mnuBookPopupMenu.Size = new System.Drawing.Size(223, 164);
+            this.mnuBookPopupMenu.Size = new System.Drawing.Size(214, 164);
             this.mnuBookPopupMenu.Opening += new System.ComponentModel.CancelEventHandler(this.mnuBookPopupMenu_Opening);
             // 
             // copyTitleMenuItem
             // 
             this.copyTitleMenuItem.Name = "copyTitleMenuItem";
-            this.copyTitleMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.copyTitleMenuItem.Size = new System.Drawing.Size(213, 22);
             this.copyTitleMenuItem.Text = "&Copy Title";
             this.copyTitleMenuItem.Click += new System.EventHandler(this.copyTitleMenuItem_Click);
             // 
             // copyLinkMenuItem
             // 
             this.copyLinkMenuItem.Name = "copyLinkMenuItem";
-            this.copyLinkMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.copyLinkMenuItem.Size = new System.Drawing.Size(213, 22);
             this.copyLinkMenuItem.Text = "Copy &Link";
             this.copyLinkMenuItem.Click += new System.EventHandler(this.copyLinkMenuItem_Click);
             // 
             // openLinkMenuItem
             // 
             this.openLinkMenuItem.Name = "openLinkMenuItem";
-            this.openLinkMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.openLinkMenuItem.Text = "Open Link";
+            this.openLinkMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.openLinkMenuItem.Text = "Ope&n Link";
             this.openLinkMenuItem.Click += new System.EventHandler(this.browseToolStripMenuItem_Click);
             // 
             // openFileMenuItem
             // 
             this.openFileMenuItem.Name = "openFileMenuItem";
-            this.openFileMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.openFileMenuItem.Text = "&Open Local File";
+            this.openFileMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.openFileMenuItem.Text = "&Open File";
             this.openFileMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // explorerFileMenuItem
             // 
             this.explorerFileMenuItem.Name = "explorerFileMenuItem";
-            this.explorerFileMenuItem.Size = new System.Drawing.Size(222, 22);
-            this.explorerFileMenuItem.Text = "Browse in Windows &Explorer";
+            this.explorerFileMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.explorerFileMenuItem.Text = "Open in Windows &Explorer";
             this.explorerFileMenuItem.Click += new System.EventHandler(this.explorerToolStripMenuItem_Click);
             // 
             // seperator1MenuItem
             // 
             this.seperator1MenuItem.Name = "seperator1MenuItem";
-            this.seperator1MenuItem.Size = new System.Drawing.Size(219, 6);
+            this.seperator1MenuItem.Size = new System.Drawing.Size(210, 6);
             // 
             // downloadToolStripMenuItem
             // 
             this.downloadToolStripMenuItem.Name = "downloadToolStripMenuItem";
-            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.downloadToolStripMenuItem.Text = "&Download";
             this.downloadToolStripMenuItem.Click += new System.EventHandler(this.downloadToolStripMenuItem_Click);
+            // 
+            // exportListMenuItem
+            // 
+            this.exportListMenuItem.Name = "exportListMenuItem";
+            this.exportListMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.exportListMenuItem.Text = "E&xport List";
+            this.exportListMenuItem.Click += new System.EventHandler(this.exportListMenuItem_Click);
             // 
             // chbCheckUnCheckAll
             // 
@@ -405,8 +415,17 @@
             this.lblKeyword.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lblKeyword.Visible = false;
             // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "xml";
+            this.saveFileDialog.FileName = "eBookDownloader.xml";
+            this.saveFileDialog.Filter = "All Files(*.*)|*.*|XML Files(*.xml)|*.xml";
+            this.saveFileDialog.FilterIndex = 2;
+            this.saveFileDialog.RestoreDirectory = true;
+            // 
             // lvwBooks
             // 
+            this.lvwBooks.AllowDrop = true;
             this.lvwBooks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -431,6 +450,8 @@
             this.lvwBooks.View = System.Windows.Forms.View.Details;
             this.lvwBooks.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.lvwBooks_ItemChecked);
             this.lvwBooks.SelectedIndexChanged += new System.EventHandler(this.lvwBooks_SelectedIndexChanged);
+            this.lvwBooks.DragDrop += new System.Windows.Forms.DragEventHandler(this.lvwBooks_DragDrop);
+            this.lvwBooks.DragEnter += new System.Windows.Forms.DragEventHandler(this.lvwBooks_DragEnter);
             this.lvwBooks.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvwBooks_MouseClick);
             // 
             // culOrder
@@ -455,6 +476,7 @@
             // 
             // frmMain
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(912, 405);
@@ -524,6 +546,8 @@
         private System.Windows.Forms.ToolStripMenuItem openLinkMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyTitleMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyLinkMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportListMenuItem;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
     }
 }
 

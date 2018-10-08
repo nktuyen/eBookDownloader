@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 using System.Diagnostics;
+using System.Xml;
 
 namespace eBookDownloader
 {
@@ -798,6 +799,7 @@ namespace eBookDownloader
             openLinkMenuItem.Visible = HitTestListColumn(2);
             copyTitleMenuItem.Visible = HitTestListColumn(1);
             copyLinkMenuItem.Visible = HitTestListColumn(2);
+            exportListMenuItem.Visible = lvwBooks.Items.Count > 0;
         }
 
         private void chbGroupByKeyword_CheckedChanged(object sender, EventArgs e)
@@ -877,6 +879,128 @@ namespace eBookDownloader
             {
                 _lastMousePos = e.Location;
             }
+        }
+
+        private void exportListMenuItem_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            XmlWriter xmlWriter = null;
+            try
+            {
+                xmlWriter = XmlWriter.Create(saveFileDialog.FileName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "eBookDownloader", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                xmlWriter = null;
+                return;
+            }
+
+            if (xmlWriter != null)
+            {
+                xmlWriter.WriteStartDocument();
+                xmlWriter.WriteStartElement("books");
+
+                Provider provider = cbbProviders.SelectedItem as Provider;
+                if (provider != null) {
+                    xmlWriter.WriteAttributeString("provider", provider.Name);
+                }
+
+                foreach (ListViewItem item in lvwBooks.Items)
+                {
+                    BookEventArg book = item.Tag as BookEventArg;
+                    if (book != null)
+                    {
+                        xmlWriter.WriteStartElement("book");
+                        xmlWriter.WriteAttributeString("title", book.Title);
+                        xmlWriter.WriteAttributeString("url", book.URL);
+                        xmlWriter.WriteEndElement();
+                    }
+                }
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndDocument();
+                xmlWriter.Flush();
+                xmlWriter.Close();
+                MessageBox.Show("Items are exported successfully.", "eBookDownloader", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void lvwBooks_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            foreach (string file in files)
+            {
+                XmlDocument xmlDocument = new XmlDocument();
+                try
+                {
+                    xmlDocument.Load(file);
+                    XmlElement docElm = xmlDocument.DocumentElement;
+                    if(docElm!=null && docElm.ChildNodes.Count > 0)
+                    {
+                        XmlNode elm = docElm.FirstChild;
+
+                        lvwBooks.Items.Clear();
+                        string title = string.Empty;
+                        string url = string.Empty;
+                        string id = string.Empty;
+                        int pos = -1;
+                        while (elm != null)
+                        {
+                            title = string.Empty;
+                            url = string.Empty;
+                            id = string.Empty;
+
+                            foreach (XmlAttribute xmlAttribute in elm.Attributes)
+                            {
+                                if (xmlAttribute.Name == "title")
+                                    title = xmlAttribute.Value;
+
+                                else if (xmlAttribute.Name == "url")
+                                    url = xmlAttribute.Value;
+
+                            }
+
+                            if (url != string.Empty)
+                            {
+                                pos = url.LastIndexOf("/");
+                                if (pos > 0)
+                                    id = url.Substring(pos + 1);
+                                else
+                                    id = url;
+
+                                ListViewItem item = lvwBooks.Items.Add(string.Format("{0}", lvwBooks.Items.Count + 1));
+                                if (item != null)
+                                {
+                                    BookEventArg book = new BookEventArg(id, title, url);
+                                    book.Index = item.Index;
+                                    item.Tag = book;
+                                    item.SubItems.Add(book.Title);
+                                    item.SubItems.Add(book.URL);
+                                    item.SubItems.Add(string.Empty);
+
+                                    this.OnFileFound(this, book);
+                                }
+                            }
+
+                            elm = elm.NextSibling;
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    xmlDocument = null;
+                    MessageBox.Show(ex.Message, "Import Files", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                break; //Use first file only
+            }
+        }
+
+        private void lvwBooks_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         }
     }
 }

@@ -46,6 +46,7 @@ namespace eBookDownloader
 
         protected string _name = string.Empty;
         protected string _home = string.Empty;
+        protected string _encodedKeyword = string.Empty;
         protected string _keyword = string.Empty;
         protected string _query = string.Empty;
         protected WebRequest _request = null;

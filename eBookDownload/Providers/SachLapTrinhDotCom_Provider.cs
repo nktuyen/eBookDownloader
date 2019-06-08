@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.XPath;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace eBookDownloader
 {
@@ -31,8 +32,9 @@ namespace eBookDownloader
 
         public override Dictionary<string,string> Search(string keyword = "")
         {
-            _keyword = WebUtility.UrlEncode(WebUtility.UrlEncode(keyword));
-            _query = "/searchbooks?keyword=" + _keyword;
+            _keyword = keyword;
+            _encodedKeyword = WebUtility.UrlEncode(WebUtility.UrlEncode(keyword));
+            _query = "/searchbooks?keyword=" + _encodedKeyword;
             HttpWebRequest httpReq = WebRequest.Create(Home + _query) as HttpWebRequest;
             Dictionary<string, string> files = new Dictionary<string, string>();
             if (httpReq != null)
@@ -53,31 +55,39 @@ namespace eBookDownloader
                 int ff = 0, ll = 0, pgs = 0;
                 while (first < htmlString.Length)
                 {
-                    if (IsCancel)
-                        return files;
-
-                    bFoundCloseTag = true;
-                    last = htmlString.IndexOf(strScripClose, first + strScriptOpen.Length + 1);
-                    if ((last > htmlString.Length) || (-1 == last) )
+                    try
                     {
-                        last = htmlString.Length;
-                        bFoundCloseTag = false;
-                    }
+                        if (IsCancel)
+                            return files;
 
-                    code = htmlString.Substring(first + strScriptOpen.Length, last - first - (bFoundCloseTag ? strScripClose.Length : 0));
-                    ff = code.IndexOf("totalPages:");
-                    if (ff > 0)
-                    {
-                        ff += "totalPages:".Length;
-                        ll = code.IndexOf(",", ff);
-                        if(ll > ff)
+                        bFoundCloseTag = true;
+                        last = htmlString.IndexOf(strScripClose, first + strScriptOpen.Length + 1);
+                        if ((last > htmlString.Length) || (-1 == last))
                         {
-                            string str = code.Substring(ff + 1, ll - ff - 1);
-                            if (int.TryParse(str.Trim(), out pgs))
-                                break;
+                            last = htmlString.Length;
+                            bFoundCloseTag = false;
                         }
+
+                        code = htmlString.Substring(first + strScriptOpen.Length, last - first - (bFoundCloseTag ? strScripClose.Length : 0));
+                        ff = code.IndexOf("totalPages:");
+                        if (ff > 0)
+                        {
+                            ff += "totalPages:".Length;
+                            ll = code.IndexOf(",", ff);
+                            if (ll > ff)
+                            {
+                                string str = code.Substring(ff + 1, ll - ff - 1);
+                                if (int.TryParse(str.Trim(), out pgs))
+                                    break;
+                            }
+                        }
+                        first = htmlString.IndexOf(strScriptOpen, last + (bFoundCloseTag ? strScripClose.Length : 0) + 1);
                     }
-                    first = htmlString.IndexOf(strScriptOpen, last + (bFoundCloseTag?strScripClose.Length:0) + 1);
+                    catch(Exception ex)
+                    {
+                        Debug.Print(ex.Message);
+                        first = htmlString.IndexOf(strScriptOpen, last + (bFoundCloseTag ? strScripClose.Length : 0) + 1);
+                    }
                 }
 
                 if (pgs > 0)
@@ -92,7 +102,8 @@ namespace eBookDownloader
                         {
                             if (IsCancel)
                                 return files;
-                            files.Add(books.Key, books.Value);
+                            if(!files.ContainsKey(books.Key))
+                                files.Add(books.Key, books.Value);
                         }
                     }
                 }
@@ -164,7 +175,10 @@ namespace eBookDownloader
                                         files.Add(bookInfo.Key, bookInfo.Value);
                                     }
                                 }
-                                catch(Exception ex) {; }
+                                catch(Exception ex)
+                                {
+                                    Debug.Print(ex.Message);
+                                }
                             }
                         }
                     }

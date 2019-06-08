@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.XPath;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace eBookDownloader
 {
@@ -31,8 +32,9 @@ namespace eBookDownloader
 
         public override Dictionary<string, string> Search(string keyword = "")
         {
-            _keyword = (WebUtility.UrlEncode(keyword));
-            _query = "?s=" + _keyword;
+            _keyword = keyword;
+            _encodedKeyword = (WebUtility.UrlEncode(keyword));
+            _query = "?s=" + _encodedKeyword;
             HttpWebRequest httpReq = WebRequest.Create(Home + _query) as HttpWebRequest;
             Dictionary<string, string> files = new Dictionary<string, string>();
             if (httpReq != null)
@@ -179,7 +181,10 @@ namespace eBookDownloader
                                         files.Add(bookInfo.Key, bookInfo.Value);
                                     }
                                 }
-                                catch (Exception ex) {; }
+                                catch (Exception ex)
+                                {
+                                    Debug.Print(ex.Message);
+                                }
                             }
                         }
                     }

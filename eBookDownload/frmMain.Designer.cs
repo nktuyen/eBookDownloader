@@ -174,6 +174,7 @@
             // 
             // lbKeywords
             // 
+            this.lbKeywords.AllowDrop = true;
             this.lbKeywords.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbKeywords.Enabled = false;
@@ -184,6 +185,8 @@
             this.lbKeywords.Size = new System.Drawing.Size(170, 82);
             this.lbKeywords.TabIndex = 3;
             this.lbKeywords.SelectedIndexChanged += new System.EventHandler(this.lbKeywords_SelectedIndexChanged);
+            this.lbKeywords.DragDrop += new System.Windows.Forms.DragEventHandler(this.LbKeywords_DragDrop);
+            this.lbKeywords.DragEnter += new System.Windows.Forms.DragEventHandler(this.LbKeywords_DragEnter);
             this.lbKeywords.DoubleClick += new System.EventHandler(this.lbKeywords_DoubleClick);
             // 
             // radSelectedKeywords
@@ -235,60 +238,60 @@
             this.downloadToolStripMenuItem,
             this.exportListMenuItem});
             this.mnuBookPopupMenu.Name = "mnuBookPopupMenu";
-            this.mnuBookPopupMenu.Size = new System.Drawing.Size(214, 164);
+            this.mnuBookPopupMenu.Size = new System.Drawing.Size(215, 164);
             this.mnuBookPopupMenu.Opening += new System.ComponentModel.CancelEventHandler(this.mnuBookPopupMenu_Opening);
             // 
             // copyTitleMenuItem
             // 
             this.copyTitleMenuItem.Name = "copyTitleMenuItem";
-            this.copyTitleMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.copyTitleMenuItem.Size = new System.Drawing.Size(214, 22);
             this.copyTitleMenuItem.Text = "&Copy Title";
             this.copyTitleMenuItem.Click += new System.EventHandler(this.copyTitleMenuItem_Click);
             // 
             // copyLinkMenuItem
             // 
             this.copyLinkMenuItem.Name = "copyLinkMenuItem";
-            this.copyLinkMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.copyLinkMenuItem.Size = new System.Drawing.Size(214, 22);
             this.copyLinkMenuItem.Text = "Copy &Link";
             this.copyLinkMenuItem.Click += new System.EventHandler(this.copyLinkMenuItem_Click);
             // 
             // openLinkMenuItem
             // 
             this.openLinkMenuItem.Name = "openLinkMenuItem";
-            this.openLinkMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.openLinkMenuItem.Size = new System.Drawing.Size(214, 22);
             this.openLinkMenuItem.Text = "Ope&n Link";
             this.openLinkMenuItem.Click += new System.EventHandler(this.browseToolStripMenuItem_Click);
             // 
             // openFileMenuItem
             // 
             this.openFileMenuItem.Name = "openFileMenuItem";
-            this.openFileMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.openFileMenuItem.Size = new System.Drawing.Size(214, 22);
             this.openFileMenuItem.Text = "&Open File";
             this.openFileMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // explorerFileMenuItem
             // 
             this.explorerFileMenuItem.Name = "explorerFileMenuItem";
-            this.explorerFileMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.explorerFileMenuItem.Size = new System.Drawing.Size(214, 22);
             this.explorerFileMenuItem.Text = "Open in Windows &Explorer";
             this.explorerFileMenuItem.Click += new System.EventHandler(this.explorerToolStripMenuItem_Click);
             // 
             // seperator1MenuItem
             // 
             this.seperator1MenuItem.Name = "seperator1MenuItem";
-            this.seperator1MenuItem.Size = new System.Drawing.Size(210, 6);
+            this.seperator1MenuItem.Size = new System.Drawing.Size(211, 6);
             // 
             // downloadToolStripMenuItem
             // 
             this.downloadToolStripMenuItem.Name = "downloadToolStripMenuItem";
-            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.downloadToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.downloadToolStripMenuItem.Text = "&Download";
             this.downloadToolStripMenuItem.Click += new System.EventHandler(this.downloadToolStripMenuItem_Click);
             // 
             // exportListMenuItem
             // 
             this.exportListMenuItem.Name = "exportListMenuItem";
-            this.exportListMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.exportListMenuItem.Size = new System.Drawing.Size(214, 22);
             this.exportListMenuItem.Text = "E&xport List";
             this.exportListMenuItem.Click += new System.EventHandler(this.exportListMenuItem_Click);
             // 
@@ -296,7 +299,7 @@
             // 
             this.chbCheckUnCheckAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbCheckUnCheckAll.AutoSize = true;
-            this.chbCheckUnCheckAll.Location = new System.Drawing.Point(15, 386);
+            this.chbCheckUnCheckAll.Location = new System.Drawing.Point(15, 542);
             this.chbCheckUnCheckAll.Name = "chbCheckUnCheckAll";
             this.chbCheckUnCheckAll.Size = new System.Drawing.Size(120, 17);
             this.chbCheckUnCheckAll.TabIndex = 6;
@@ -313,7 +316,7 @@
             // progressBar
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.progressBar.Location = new System.Drawing.Point(15, 384);
+            this.progressBar.Location = new System.Drawing.Point(15, 540);
             this.progressBar.MarqueeAnimationSpeed = 10;
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(885, 18);
@@ -348,9 +351,9 @@
             this.chbGroupByKeyword.AutoSize = true;
             this.chbGroupByKeyword.Location = new System.Drawing.Point(42, 86);
             this.chbGroupByKeyword.Name = "chbGroupByKeyword";
-            this.chbGroupByKeyword.Size = new System.Drawing.Size(144, 17);
+            this.chbGroupByKeyword.Size = new System.Drawing.Size(353, 17);
             this.chbGroupByKeyword.TabIndex = 15;
-            this.chbGroupByKeyword.Text = "Group books by keyword";
+            this.chbGroupByKeyword.Text = "Group downloaded files into directories according searched keywords";
             this.chbGroupByKeyword.UseVisualStyleBackColor = true;
             this.chbGroupByKeyword.CheckedChanged += new System.EventHandler(this.chbGroupByKeyword_CheckedChanged);
             // 
@@ -370,7 +373,6 @@
             this.txtWorkingDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txtWorkingDirectory.Location = new System.Drawing.Point(144, 28);
             this.txtWorkingDirectory.Name = "txtWorkingDirectory";
-            this.txtWorkingDirectory.ReadOnly = true;
             this.txtWorkingDirectory.Size = new System.Drawing.Size(267, 20);
             this.txtWorkingDirectory.TabIndex = 13;
             // 
@@ -402,12 +404,13 @@
             this.btnDownload.TabIndex = 10;
             this.btnDownload.Text = "Download";
             this.btnDownload.UseVisualStyleBackColor = true;
+            this.btnDownload.Click += new System.EventHandler(this.btnDownload_Click);
             // 
             // lblKeyword
             // 
             this.lblKeyword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblKeyword.AutoSize = true;
-            this.lblKeyword.Location = new System.Drawing.Point(855, 387);
+            this.lblKeyword.Location = new System.Drawing.Point(855, 543);
             this.lblKeyword.Name = "lblKeyword";
             this.lblKeyword.Size = new System.Drawing.Size(42, 13);
             this.lblKeyword.TabIndex = 12;
@@ -444,7 +447,7 @@
             this.lvwBooks.Location = new System.Drawing.Point(15, 233);
             this.lvwBooks.Name = "lvwBooks";
             this.lvwBooks.ShowItemToolTips = true;
-            this.lvwBooks.Size = new System.Drawing.Size(885, 146);
+            this.lvwBooks.Size = new System.Drawing.Size(885, 302);
             this.lvwBooks.TabIndex = 3;
             this.lvwBooks.UseCompatibleStateImageBehavior = false;
             this.lvwBooks.View = System.Windows.Forms.View.Details;
@@ -476,10 +479,9 @@
             // 
             // frmMain
             // 
-            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(912, 405);
+            this.ClientSize = new System.Drawing.Size(912, 561);
             this.Controls.Add(this.lblKeyword);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.lvwBooks);

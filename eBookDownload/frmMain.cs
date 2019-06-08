@@ -13,6 +13,7 @@ using System.Net;
 using System.IO;
 using System.Diagnostics;
 using System.Xml;
+using System.Runtime.CompilerServices;
 
 namespace eBookDownloader
 {
@@ -114,7 +115,10 @@ namespace eBookDownloader
                 }
                 reader.Close();
             }
-            catch (Exception ex) {; }
+            catch (Exception ex)
+            {
+                DebugPrint(ex.Message);
+            }
 
             lvwBooks.SmallImageList = new ImageList();
             lvwBooks.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Success);
@@ -164,7 +168,7 @@ namespace eBookDownloader
                 {
                     if (strCategory != string.Empty)
                     {
-                        strFullPath += strCategory;
+                        strFullPath += ReplaceSpecialCharacters(strCategory);
                         strFullPath += "\\";
                     }
                     strFullPath += (ReplaceSpecialCharacters(e.Title) + "." + strExt);
@@ -206,7 +210,6 @@ namespace eBookDownloader
 
                     e.Overwriten = chbOverwritenDownload.Checked;
                     e.Download = chbAutoDownload.Checked;
-                    e.Group = chbGroupByKeyword.Checked;
                     e.Group = chbGroupByKeyword.Checked;
 
                     string strDir = txtWorkingDirectory.Text;
@@ -342,6 +345,26 @@ namespace eBookDownloader
                 if (searchWorker.IsBusy)
                     return;
 
+                if (!Directory.Exists(txtWorkingDirectory.Text))
+                {
+                    DialogResult result = MessageBox.Show("Directory \"" + txtWorkingDirectory.Text + "\" is not exist.\nDo you want to create it now?", "Information", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if(result == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            Directory.CreateDirectory(txtWorkingDirectory.Text);
+                        }
+                        catch(Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Create Directory failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid/Not existing Working Directory may cause Download to be failed!!!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+
                 Work = Work.eSearching;
 
                 if (radInputKeyword.Checked)
@@ -349,7 +372,7 @@ namespace eBookDownloader
                 else
                     searchWorker.RunWorkerAsync(new object[] { provider, lbKeywords.SelectedItems });
             }
-            else if(Work== Work.eSearching)
+            else if(Work == Work.eSearching)
             {
                 if (searchWorker.IsBusy)
                 {
@@ -395,7 +418,7 @@ namespace eBookDownloader
             }
         }
 
-        private void OnSearchWorkerStart()
+        private void OnSearchWorkerStart(bool clear = true)
         {
             if (progressBar.InvokeRequired || btnSearch.InvokeRequired ||
                 radInputKeyword.InvokeRequired || radSelectedKeywords.InvokeRequired ||
@@ -404,13 +427,15 @@ namespace eBookDownloader
                 lbKeywords.InvokeRequired || txtKeyword.InvokeRequired ||
                 lvwBooks.InvokeRequired || chbCheckUnCheckAll.InvokeRequired ||
                 btnBrowseWorkingDir.InvokeRequired || chbOverwritenDownload.InvokeRequired ||
-                chbGroupByKeyword.InvokeRequired || lblKeyword.InvokeRequired)
+                chbGroupByKeyword.InvokeRequired || lblKeyword.InvokeRequired ||
+                txtWorkingDirectory.InvokeRequired)
             {
-                this.Invoke(new Action(OnSearchWorkerStart), new object[] { });
+                this.Invoke(new Action<bool>(OnSearchWorkerStart), new object[] { clear });
             }
             else
             {
-                lvwBooks.Items.Clear();
+                if(clear)
+                    lvwBooks.Items.Clear();
                 chbCheckUnCheckAll.Checked = false;
                 progressBar.Visible = true;
                 DisableControl(chbAutoDownload);
@@ -427,6 +452,7 @@ namespace eBookDownloader
                 DisableControl(btnAddKeyword);
                 DisableControl(btnRemoveKeyword);
                 DisableControl(btnClearKeywords);
+                DisableControl(txtWorkingDirectory);
                 progressBar.Width = lvwBooks.Width;
                 chbCheckUnCheckAll.Visible = false;
                 _files.Clear();
@@ -453,7 +479,8 @@ namespace eBookDownloader
                 lbKeywords.InvokeRequired || txtKeyword.InvokeRequired ||
                 lvwBooks.InvokeRequired || chbCheckUnCheckAll.InvokeRequired || 
                 btnBrowseWorkingDir.InvokeRequired ||chbOverwritenDownload.InvokeRequired ||
-                chbGroupByKeyword.InvokeRequired || lblKeyword.InvokeRequired)
+                chbGroupByKeyword.InvokeRequired || lblKeyword.InvokeRequired ||
+                txtWorkingDirectory.InvokeRequired)
             {
                 this.Invoke(new Action(OnSearchWorkerFinish), new object[] { });
             }
@@ -471,6 +498,7 @@ namespace eBookDownloader
                 RestoreControlState(btnAddKeyword);
                 RestoreControlState(btnRemoveKeyword);
                 RestoreControlState(btnClearKeywords);
+                RestoreControlState(txtWorkingDirectory);
                 lblKeyword.Visible = false;
                 lblKeyword.Text = string.Empty;
                 chbCheckUnCheckAll.Visible = true;
@@ -499,6 +527,9 @@ namespace eBookDownloader
 
         private void searchWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            progressBar.Minimum = 0;
+            progressBar.Maximum = 100;
+            progressBar.Style = ProgressBarStyle.Marquee;
             OnSearchWorkerStart();
 
             object[] parameters = e.Argument as object[];
@@ -619,6 +650,11 @@ namespace eBookDownloader
             btnSearch.Enabled = (txtKeyword.Text != string.Empty && radInputKeyword.Checked) || (lbKeywords.SelectedIndex != -1 && radSelectedKeywords.Checked);
         }
 
+        private void DebugPrint(string msg, [CallerLineNumber] int line = 0, [CallerMemberName] string name = null)
+        {
+            Debug.Print(msg);
+        }
+
         private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
         {
             try
@@ -630,7 +666,10 @@ namespace eBookDownloader
                 }
                 writer.Close();
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+                DebugPrint(ex.Message);
+            }
 
             if (Providers.Instance.First())
             {
@@ -659,7 +698,12 @@ namespace eBookDownloader
             if (Work == Work.eIdle)
             {
                 Work = Work.eDownloading;
-                downloadWorker.RunWorkerAsync(new object[] { lvwBooks.CheckedItems.Count });
+                List<ListViewItem> items = new List<ListViewItem>();
+                foreach (ListViewItem item in lvwBooks.CheckedItems)
+                {
+                    items.Add(item);
+                }
+                downloadWorker.RunWorkerAsync(new object[] { lvwBooks.CheckedItems.Count, items });
             }
             else if(Work == Work.eDownloading)
             {
@@ -677,6 +721,16 @@ namespace eBookDownloader
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             BookEventArg book = e.UserState as BookEventArg;
+            if (progressBar.InvokeRequired)
+            {
+                progressBar.Invoke(new MethodInvoker(delegate {
+                    progressBar.Value++;
+                }));
+            }
+            else
+            {
+                progressBar.Value++;
+            }
         }
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -689,6 +743,7 @@ namespace eBookDownloader
             if (lvwBooks.InvokeRequired)
             {
                 Invoke(new System.ComponentModel.DoWorkEventHandler(downloadWorker_DoWork), new object[] { sender, e });
+                return;
             }
 
             object[] arguments = e.Argument as object[];
@@ -696,26 +751,34 @@ namespace eBookDownloader
             string title = string.Empty;
             string location = string.Empty;
             int id = -1;
-            object[] items = arguments[1] as object[];
+            Nullable<int> count = arguments[0] as Nullable<int>;
+            List<ListViewItem> items = arguments[1] as List<ListViewItem>;
 
+            progressBar.Minimum = 0;
+            progressBar.Maximum = count.Value;
+            progressBar.Style = ProgressBarStyle.Blocks;
+            OnSearchWorkerStart(false);
             foreach (ListViewItem item in items)
             {
                 id = item.Index;
                 title = item.SubItems[1].Text;
                 url = item.SubItems[2].Text;
+                location = item.SubItems[3].Text;
                 try
                 {
                     WebClient webClient = new WebClient();
                     webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(OnDownloadFileCompleted);
                     webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(OnDownloadProgressChanged);
 
-                    webClient.DownloadFileAsync(new Uri(url), title);
+                    webClient.DownloadFile(new Uri(url), location);
                 }
                 catch (Exception ex)
                 {
+                    DebugPrint(ex.Message);
                     continue;
                 }
             }
+            OnSearchWorkerFinish();
         }
 
         private void downloadWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -849,7 +912,7 @@ namespace eBookDownloader
             }
             catch (Exception ex)
             {
-                Debug.Print(ex.Message);
+                DebugPrint(ex.Message);
             }
         }
 
@@ -869,7 +932,7 @@ namespace eBookDownloader
             }
             catch (Exception ex)
             {
-                Debug.Print(ex.Message);
+                DebugPrint(ex.Message);
             }
         }
 
@@ -1001,6 +1064,43 @@ namespace eBookDownloader
         private void lvwBooks_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
+
+        private void LbKeywords_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
+                e.Effect = DragDropEffects.Copy;
+        }
+
+        private void LbKeywords_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            StreamReader reader = null;
+            string line = string.Empty;
+            foreach (string file in files)
+            {
+                try
+                {
+                    reader = new StreamReader(file);
+                    while (!reader.EndOfStream)
+                    {
+                        line = reader.ReadLine();
+                        line = line.Trim();
+                        if (line == string.Empty)
+                            continue;
+
+                        if (!lbKeywords.Items.Contains(line))
+                            lbKeywords.Items.Add(line);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    DebugPrint(ex.Message);
+                }
+            }
+
+            btnRemoveKeyword.Enabled = lbKeywords.SelectedIndex != -1;
+            btnSearch.Enabled = (txtKeyword.Text != string.Empty && radInputKeyword.Checked) || (lbKeywords.SelectedIndex != -1 && radSelectedKeywords.Checked);
         }
     }
 }

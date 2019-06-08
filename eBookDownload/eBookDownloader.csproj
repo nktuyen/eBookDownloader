@@ -125,5 +125,8 @@
   <ItemGroup>
     <None Include="Properties\Success.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\Exist.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

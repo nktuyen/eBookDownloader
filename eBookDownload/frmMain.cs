@@ -123,6 +123,7 @@ namespace eBookDownloader
             lvwBooks.SmallImageList = new ImageList();
             lvwBooks.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Success);
             lvwBooks.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Error);
+            lvwBooks.SmallImageList.Images.Add(eBookDownloader.Properties.Resources.Exist);
 
             searchWorker.WorkerSupportsCancellation = true;
             downloadWorker.WorkerSupportsCancellation = true;
@@ -161,7 +162,7 @@ namespace eBookDownloader
 
                 if (e.Group)
                     strCategory = e.Category;
-
+                   
                 string strFullPath = strDir;
 
                 if (strExt != string.Empty)
@@ -276,18 +277,7 @@ namespace eBookDownloader
             {
                 ListViewItem item = lvwBooks.Items[e.Index];
                 item.SubItems[3].Text = e.Path;
-                if (e.Status == 0) //Success
-                {
-                    item.ImageIndex = 0;
-                }
-                else if (e.Status == -1) //Aborted
-                {
-
-                }
-                else //Failed
-                {
-                    item.ImageIndex = 1;
-                }
+                item.ImageIndex = e.Status;
             }
         }
 

@@ -236,7 +236,7 @@ namespace eBookDownloader
                         BookDownloadingFileExist?.Invoke(this, e);
                         if (!e.Overwriten)
                         {
-                            e.Status = 0;
+                            e.Status = 2;
                             e.Progress = 100;
                             BookDownloadCompleted?.Invoke(this, e);
                             return;
@@ -269,7 +269,7 @@ namespace eBookDownloader
                 }
                 catch(Exception ex)
                 {
-                    e.Status = ex.HResult;
+                    e.Status = 2;
                     e.Progress = 100;
                     BookDownloadCompleted?.Invoke(this, e);
                     return;

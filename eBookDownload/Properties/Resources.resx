@@ -121,6 +121,9 @@
   <data name="Error" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Error.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Exist" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Exist.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="IDS_CANCEL" xml:space="preserve">
     <value>&amp;Cancel</value>
   </data>

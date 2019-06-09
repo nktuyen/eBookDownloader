@@ -269,7 +269,7 @@ namespace eBookDownloader
                 }
                 catch(Exception ex)
                 {
-                    e.Status = 2;
+                    e.Status = 1;
                     e.Progress = 100;
                     BookDownloadCompleted?.Invoke(this, e);
                     return;
